@@ -8,4 +8,4 @@ A Graphical GUI Editor Build in Python
 # Design and Architecture
 
 # Contribution
-
+Prakhar Singhal
