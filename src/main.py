@@ -15,6 +15,7 @@ def main():
     selected_objects = [] # Stores the current objects
     window.canvas.bind("<Motion>", '-Motion-')
     group_mode = False
+    ungroup_mode = False
     selected_indices = set()
     drawing_object = 0 # 0 refers to not drawing. 1 refers to line and 2 refers to rectangle
     start_pt = None
@@ -71,6 +72,25 @@ def main():
             #     window.canvas.erase()
             #     for drawable in drawables:
             #         drawable.draw(window)
+        
+        elif ungroup_mode:
+            if event == "-CANVAS-":
+                click_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
+                for drawable in drawables:
+                    if drawable.detect_selection(click_pt):
+                        selected_group = drawable
+                        break
+                if isinstance(selected_group, Group):
+                    ind = drawables.index(selected_group)
+                    drawables += drawables[ind].objects
+                    drawables.pop(ind)
+                    window.canvas.erase()
+                    for drawable in drawables:
+                        drawable.draw(window)
+                    selected_group=None
+                    selected_object= None
+                    ungroup_mode = False
+
         else:
             if event == "-LINE-":
                 # drawing_line = True
@@ -133,7 +153,7 @@ def main():
             
             
 
-        if event == "-UNGROUP-" and selected_group:
+        if event == "-UNGROUP-":
             # new_drawables = []
             # for drawable in drawables:
             #     if isinstance(drawable, Group):
@@ -141,14 +161,17 @@ def main():
             #     else:
             #         new_drawables.append(drawable)
             # drawables = new_drawables
-            ind = drawables.index(selected_group)
-            drawables += drawables[ind].objects
-            drawables.pop(ind)
-            window.canvas.erase()
-            for drawable in drawables:
-                drawable.draw(window)
-            selected_group=None
-            selected_object= None
+
+
+            # ind = drawables.index(selected_group)
+            # drawables += drawables[ind].objects
+            # drawables.pop(ind)
+            # window.canvas.erase()
+            # for drawable in drawables:
+            #     drawable.draw(window)
+            # selected_group=None
+            # selected_object= None
+            ungroup_mode = True
 
         if event == '-CANVAS--Motion-' and start_pt:
             window.canvas.erase()
