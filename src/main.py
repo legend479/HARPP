@@ -54,7 +54,7 @@ def main():
                     for drawable in drawables:
                         drawable.draw(window)
 
-                window.window["GROUP"].update(text = "Group")
+                window.window["-GROUP-"].update(text = "Group")
 
         if group_mode:
             window.window["-GROUP-"].update(text = "Done")
@@ -192,7 +192,26 @@ def main():
                     window.canvas.draw_line(start_pt, cursor_pos, color=PEN_COLOR, width=PEN_SIZE)
                 case 2:
                     window.canvas.draw_rectangle(start_pt, cursor_pos, line_color=PEN_COLOR, line_width=PEN_SIZE)
+        if event == "-SAVE-":
+            save_path = sg.popup_get_file("Save Drawing", save_as=True, default_extension=".txt")
+            if save_path:
+                exporter = Exporter(drawables)
+                exporter.save_to_file(save_path)
 
+        if event == "-OPEN-":
+            open_path = sg.popup_get_file("Open Drawing", default_extension=".txt")
+            if open_path:
+                print(open_path)
+                if len(drawables) > 0:
+                    confirm = sg.popup_yes_no("You have unsaved changes. Do you want to continue?")
+                    if confirm == "No":
+                        continue
+                exporter = Exporter([])
+                drawables = exporter.load_from_file(open_path)
+                window.canvas.erase()
+                print(drawables)
+                for drawable in drawables:
+                    drawable.draw(window)
         if event == '-CLEAR-':
             drawables = []
             window.canvas.erase()

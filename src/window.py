@@ -28,6 +28,10 @@ class Window:
             sg.Button("Export", size=(10, 1), enable_events=True, key="-EXPORT-"),
             sg.Button("Group", size=(10, 1), enable_events=True, key="-GROUP-"),
             sg.Button("UnGroup", size=(10, 1), enable_events=True, key="-UNGROUP-"),
+            sg.Button("Save", size=(10, 1), enable_events=True, key="-SAVE-"),
+            sg.Button("Open", size=(10, 1), enable_events=True, key="-OPEN-"),
+
+
 
         ]
 

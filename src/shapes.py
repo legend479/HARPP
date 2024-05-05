@@ -21,12 +21,16 @@ class Shape(Object):
         self.id = None
 
     def move(self, delta):
-        print(delta)
-        self.start_point[0] += delta[0]
-        self.start_point[1] += delta[1]
+        start_x, start_y = self.start_point
+        end_x, end_y = self.end_point
 
-        self.end_point[0] += delta[0]
-        self.end_point[1] += delta[1]
+        start_x += delta[0]
+        start_y += delta[1]
+        end_x += delta[0]
+        end_y += delta[1]
+
+        self.start_point = (start_x, start_y)
+        self.end_point = (end_x, end_y)
 
         self.centroid[0] += delta[0]
         self.centroid[1] += delta[1]
@@ -38,7 +42,7 @@ class Line(Shape):
         This is the line class it helps in making and storing the lines made.
     """
 
-    def __init__(self, start_point: tuple[int,int], end_point: tuple[int,int]):
+    def __init__(self, start_point: tuple[int,int], end_point: tuple[int,int], color = DEFAULT_COLOR):
         super().__init__(start_point, end_point)
         diff = [start_point[0] - end_point[0], start_point[1] - end_point[1]]
         if diff[1] != 0:
@@ -78,7 +82,7 @@ class Line(Shape):
 
 class Rectangle(Shape):
 
-    def __init__(self, start_point: tuple[int,int], end_point: tuple[int,int], corner_type = 's'):
+    def __init__(self, start_point: tuple[int,int], end_point: tuple[int,int], color = DEFAULT_COLOR, corner_type = 's'):
         super().__init__(start_point, end_point)
         self.corner_type = corner_type
 
