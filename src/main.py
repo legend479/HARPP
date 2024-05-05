@@ -15,10 +15,12 @@ def main():
             break
         if event == "-LINE-":
             drawing_line = True
+            drawing_rect = False
             start_pt = None
             end_pt = None
             
         if event == "-RECT-":
+            drawing_line = False
             drawing_rect = True
             start_pt = None
             end_pt = None
@@ -36,7 +38,7 @@ def main():
                 start_pt = (values["-CANVAS-"][0], values["-CANVAS-"][1])
             else:
                 end_pt = (values["-CANVAS-"][0], values["-CANVAS-"][1])
-                window.canvas.draw_rectangle(start_pt, end_pt, fill_color=PEN_COLOR, line_color=PEN_COLOR)
+                window.canvas.draw_rectangle(start_pt, end_pt, line_color=PEN_COLOR, line_width=PEN_SIZE)
                 drawing_rect = False
                 
     
