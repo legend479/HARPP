@@ -27,17 +27,17 @@ def main():
         
         if drawing_line and event == "-CANVAS-":
             if start_pt is None:
-                start_pt = (values["-CANVAS-"][0], values["-CANVAS-"][1])
+                start_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
             else:
-                end_pt = (values["-CANVAS-"][0], values["-CANVAS-"][1])
+                end_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
                 window.canvas.draw_line(start_pt, end_pt, color=PEN_COLOR, width=PEN_SIZE)
                 drawing_line = False
         
         if drawing_rect and event == "-CANVAS-":
             if start_pt is None:
-                start_pt = (values["-CANVAS-"][0], values["-CANVAS-"][1])
+                start_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
             else:
-                end_pt = (values["-CANVAS-"][0], values["-CANVAS-"][1])
+                end_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
                 window.canvas.draw_rectangle(start_pt, end_pt, line_color=PEN_COLOR, line_width=PEN_SIZE)
                 drawing_rect = False
                 
