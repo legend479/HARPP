@@ -119,6 +119,14 @@ def main():
                         window.canvas.erase()
                         for drawable in drawables:
                             drawable.draw(window)
+        
+        if selected_group :
+            selected_group.move(values["-CANVAS-"])
+            window.canvas.erase()
+            for drawable in drawables:
+                drawable.draw(window)
+            
+            
 
         if event == "-UNGROUP-" and selected_group:
             # new_drawables = []
