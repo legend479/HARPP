@@ -3,7 +3,7 @@ from object import Object
 from collections import *
 from typing import List
 PEN_SIZE = 5
-EPSILON = 10
+EPSILON = 7
 INF = 100000000000000000000000000000
 DEFAULT_COLOR = 'black'
 CORNER_TYPE = ["pointed", "CURVY"]
@@ -47,12 +47,12 @@ class Line(Shape):
 
     def detect_selection(self, point: tuple[int,int]):
         x,y = point
-        if self.orientation == INF:
-            if abs( y-self.start_point[1]) <= EPSILON and (x <= self.start_point[0] and x >= self.end_point[0] or x >= self.start_point[0] and x <= self.end_point[0]):
-                return self
-        else:
-            if abs((self.orientation*y - x) -  (self.orientation*self.end_point[1] - self.end_point[0])) <= EPSILON:
-                return self
+        disl = abs(x-self.start_point[0])+abs(y-self.start_point[1])
+        disr = abs(x-self.end_point[0])+abs(y-self.end_point[1])
+
+        if abs(disl+disr - (abs(self.end_point[1]-self.start_point[1])+abs(self.end_point[0]-self.start_point[0]))) < EPSILON:
+            print("selected")
+            return self
 
         return None
 
@@ -80,8 +80,16 @@ class Rectangle(Shape):
 
     def detect_selection(self, point: tuple[int,int]):
         x,y = point
-        if x <= self.end_point[0] and x >= self.start_point[0] and y <= self.start_point[1] and y >= self.end_point[1]:
+        # if x <= self.end_point[0] and x >= self.start_point[0] and y <= self.start_point[1] and y >= self.end_point[1]:
+        #     return self
+
+        minx = min(self.start_point[0], self.end_point[0])
+        miny = min(self.start_point[1], self.end_point[1])
+        maxx = max(self.start_point[0], self.end_point[0])
+        maxy = max(self.start_point[1], self.end_point[1])
+        if x <= maxx and x >= minx and y <= maxy and y >= miny:
             return self
+        return None
         pass
 
 #

@@ -134,6 +134,8 @@ def main():
             window.canvas.erase()
             for drawable in drawables:
                 drawable.draw(window)
+            selected_group=None
+            selected_object= None
 
         if event == '-CANVAS--Motion-' and start_pt:
             window.canvas.erase()
