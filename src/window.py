@@ -1,16 +1,30 @@
 # Description: Editor window for the user to interact with the program
 
-import pysimplegui as sg
+import PySimpleGUI as sg
+
 
 class Window:
-    INITIAL_LAYOUT = [
-        [sg.Text("HARPP Editor", size=(30, 1), justification="center")],
-        [sg.Text("Test", size=(30, 1), justification="center")],
-    ]
-    
-    def __init__(self, layout=INITIAL_LAYOUT, title="HARPP Editor"):
-        self.layout = layout
-        self.window = sg.Window("HARPP Editor", layout=self.layout, margins=(0, 0))
+
+    def __init__(self, title="HARPP Editor"):
+        
+        self.canvas = sg.Graph(
+            canvas_size=(800, 600),
+            graph_bottom_left=(0, 0),
+            graph_top_right=(800, 600),
+            background_color="white",
+            enable_events=True,
+            key="canvas",
+        )
+        
+        self.layout = [
+            [sg.Text("HARPP Editor", size=(30, 1), justification="center")],
+            [self.canvas],
+            [sg.Text("Test", size=(30, 1), justification="center")],
+        ]
+
+        
+        self.window = sg.Window(
+            "HARPP Editor", layout=self.layout, margins=(0, 0))
 
     def display(self):
         while True:
@@ -18,8 +32,5 @@ class Window:
             if event == sg.WIN_CLOSED:
                 break
         self.window.close()
-    
 
-if __name__ == "__main__":
-    window = Window()
-    window.display()
+
