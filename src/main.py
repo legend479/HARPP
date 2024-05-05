@@ -54,7 +54,7 @@ def main():
                     for drawable in drawables:
                         drawable.draw(window)
 
-                    window.window["GROUP"].update(text = "Group")
+                window.window["GROUP"].update(text = "Group")
 
         if group_mode:
             window.window["-GROUP-"].update(text = "Done")
@@ -110,6 +110,13 @@ def main():
             if event == '-EXPORT-':
                 exporter = Exporter(drawables)
                 exporter.export_to_xml('drawing.xml')
+
+            if event == "-DELETE-":
+                if selected_group:
+                    ind = drawable.index(selected_group)
+                    drawable.remove(ind)
+                    selected_group = None
+                    selected_object = None
 
             if event == '-CANVAS-':
                 if drawing_object:
