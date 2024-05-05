@@ -1,17 +1,9 @@
 import PySimpleGUI as sg
-import datetime
-
-
-class BoundingBox:
-    def __init__(self, height: int, width: int, centoid: tuple[int, int]) -> None:
-        self.hieght = height
-        self.width = width
-        self.centroid = centoid
-        self.orientation = 0
-
 
 class Object():
-
+    """
+        This is the master class for both group and shapes. It provides them a basic structure to start with.
+    """
     def __init__(self, start_point, end_point):
 
         self.width = end_point[0] - start_point[0]
@@ -20,6 +12,6 @@ class Object():
         self.start_point = start_point
         self.end_point = end_point
 
-  
+
     def contains_point(self, point):
         raise NotImplementedError("Contains point method not implemented")
