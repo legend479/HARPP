@@ -15,3 +15,9 @@ TODO
 - Implement export 
 
 - Documentation
+
+- Clean Up code 
+    -- Remove unsede classs Bounding Box
+    -- Refactor logic conditional blocks
+    -- Add commest and type hinting/annotation
+    -- Add required modules to requirements.txt
