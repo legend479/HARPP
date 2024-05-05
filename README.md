@@ -9,3 +9,4 @@ A Graphical GUI Editor Build in Python
 
 # Contribution
 Prakhar Singhal
+Prakhar Jain
