@@ -3,7 +3,7 @@ from object import Object
 from collections import *
 from typing import List
 PEN_SIZE = 5
-EPSILON = 7
+EPSILON = 20
 INF = 100000000000000000000000000000
 DEFAULT_COLOR = 'black'
 CORNER_TYPE = ["pointed", "CURVY"]
@@ -69,13 +69,21 @@ class Line(Shape):
             It detects whether the click is inside the shape is or not
         """
         x,y = point
-        disl = abs(x-self.start_point[0])+abs(y-self.start_point[1])
-        disr = abs(x-self.end_point[0])+abs(y-self.end_point[1])
+        minx = min(self.start_point[0], self.end_point[0])
+        maxx = max(self.start_point[0], self.end_point[0])
+        miny = min(self.start_point[1], self.end_point[1])
+        maxy = max(self.start_point[1], self.end_point[1])
+        if x<maxx and x>minx and y<maxy and y>miny:
+            x, y = point
+            # Calculate the line equation: Ax + By + C = 0
+            A = self.end_point[1] - self.start_point[1]
+            B = self.start_point[0] - self.end_point[0]
+            C = self.start_point[1] * self.end_point[0] - self.start_point[0] * self.end_point[1]
 
-        if abs(disl+disr - (abs(self.end_point[1]-self.start_point[1])+abs(self.end_point[0]-self.start_point[0]))) < EPSILON:
-            print("selected")
-            return self
+            distance = abs(A * x + B * y + C) / ((A ** 2 + B ** 2) ** 0.5)
 
+            if distance < EPSILON:
+                return self
         return None
 
 
