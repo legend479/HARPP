@@ -4,6 +4,11 @@ import PySimpleGUI as sg
 
 
 class Window:
+    """
+        Manages the main window of the drawing
+        program. Handles background settings, dis-
+        play, events, and closing.
+    """
 
     def __init__(self, title="HARPP Editor"):
 
@@ -48,7 +53,13 @@ class Window:
         self.window.close()
 
     def event(self):
+        """
+            It gives the event currently going on the frame
+        """
         return self.window.read()
 
     def close(self):
+        """
+            It closes the Window
+        """
         self.window.close()
