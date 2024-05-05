@@ -65,6 +65,10 @@ def main():
                         drawables.append(Rectangle(start_pt, end_pt))
                     drawing_object = 0
 
+            else:
+                # iterate through the drawables to detect selection clicks
+                # do any recursive traversal
+
         
         window.canvas.erase() # So that window refreshes everytime, so that we can delete objects if we need to.
                 
