@@ -1,5 +1,7 @@
-import xml.etree.ElementTree as ET
+from xml.dom import minidom
 from shapes import Line, Rectangle
+
+import xml.etree.ElementTree as ET
 
 class Exporter:
     def __init__(self, drawables: list[object]):
@@ -11,7 +13,11 @@ class Exporter:
             self.root.append(self._convert_to_xml(drawable))
 
         tree = ET.ElementTree(self.root)
-        tree.write(file_path)
+        xml_str = ET.tostring(self.root, encoding='utf-8')
+        xml_pretty_str = minidom.parseString(xml_str).toprettyxml(indent="  ")
+
+        with open(file_path, "w") as file:
+            file.write(xml_pretty_str)
 
     def _convert_to_xml(self, drawable: object):
         if isinstance(drawable, Line):
