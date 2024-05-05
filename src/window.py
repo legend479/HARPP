@@ -20,6 +20,8 @@ class Window:
             sg.Button("Line", size=(10, 1), enable_events=True, key="-LINE-"),
             sg.Button("Rect", size=(10, 1), enable_events=True, key="-RECT-"),
             sg.Button("Export", size=(10, 1), enable_events=True, key="-EXPORT-"),
+            sg.Button("Group", size=(10, 1), enable_events=True, key="-GROUP-"),
+            sg.Button("Ungroup", size=(10, 1), enable_events=True, key="-UNGROUP-"),
 
         ]
 

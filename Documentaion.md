@@ -45,6 +45,6 @@ We will follow the Gitflow branching strategy, which consists of the following b
 
 - Raveesh
 
-- Atidipt
+- Atidipt 
 
 If Unsure of your code's working please push it into a seprate branch which can be reviewed later to be merged into the main branch.

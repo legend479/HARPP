@@ -28,3 +28,5 @@ class Object():
         self.start_point = start_point
         self.end_point = end_point
         
+    def contains_point(self, point):
+        raise NotImplementedError("Contains point method not implemented")

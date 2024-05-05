@@ -12,7 +12,7 @@ def main():
     drawables = [] # Collection of all groups and individual objects.
     # drawing_line = False
     # drawing_rect = False
-    
+    selected_objects = [] # Stores the current objects
     window.canvas.bind("<Motion>", '-Motion-')
 
     drawing_object = 0 # 0 refers to not drawing. 1 refers to line and 2 refers to rectangle
@@ -46,7 +46,20 @@ def main():
         if event == '-EXPORT-':
             exporter = Exporter(drawables)
             exporter.export_to_xml('drawing.xml')
-        
+        if event == "-GROUP-":
+            if selected_objects:
+                group = Group(selected_objects)
+                drawables.append(group)
+                selected_objects.clear()
+
+        if event == "-UNGROUP-":
+            new_drawables = []
+            for drawable in drawables:
+                if isinstance(drawable, Group):
+                    new_drawables.extend(drawable.objects)
+                else:
+                    new_drawables.append(drawable)
+            drawables = new_drawables
         # if drawing_line and event == "-CANVAS-":
         #     if start_pt is None:
         #         start_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
@@ -64,7 +77,16 @@ def main():
         #         # window.canvas.draw_rectangle(start_pt, end_pt, line_color=PEN_COLOR, line_width=PEN_SIZE)
         #         drawables.append(Rectangle(start_pt, end_pt))
         #         drawing_rect = False
-
+        # Handle object selection
+        if event == "-CANVAS-" and not drawing_object:
+            cursor_pos = values["-CANVAS-"]
+            for drawable in drawables:
+                if drawable.contains_point(cursor_pos):
+                    if drawable not in selected_objects:
+                        selected_objects.append(drawable)
+                    break
+            else:
+                selected_objects.clear()
         if event == '-CANVAS-':
             if drawing_object:
                 if start_pt is None:
@@ -93,6 +115,8 @@ def main():
                     window.canvas.erase()
                     for drawable in drawables:
                         drawable.draw(window)
+
+
                 pass
         
         if event == '-CANVAS--Motion-' and start_pt:
