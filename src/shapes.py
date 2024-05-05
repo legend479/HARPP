@@ -1,12 +1,14 @@
 import PySimpleGUI as sg
 from object import Object
 from collections import *
-from typing import List
+import math
+
 PEN_SIZE = 5
 EPSILON = 20
 INF = 100000000000000000000000000000
 DEFAULT_COLOR = 'black'
-CORNER_TYPE = ["pointed", "CURVY"]
+CORNER_TYPE = ["Sharp", "Rounded"]
+ROUND_RADIUS = 10
 
 
 class Shape(Object):
@@ -54,7 +56,8 @@ class Line(Shape):
         """
             It draws the shape
         """
-        self.id = window.canvas.draw_line(self.start_point, self.end_point, color = self.colour, width=self.pen_width)
+        self.id = window.canvas.draw_line(
+            self.start_point, self.end_point, color=self.colour, width=self.pen_width)
 
     # def move(self, new_point: tuple[int,int]):
     #     '''
@@ -64,7 +67,7 @@ class Line(Shape):
     #     self.end_point = [new_point[0] + self.width, new_point[1] + self.height]
     #     self.centroid = [(self.start_point[0] + self.end_point[0]) / 2 , (self.start_point[1] + self.end_point[1]) / 2]
 
-    def detect_selection(self, point: tuple[int,int]):
+    def detect_selection(self, point: tuple[int, int]):
         """
             It detects whether the click is inside the shape is or not
         """
@@ -87,18 +90,47 @@ class Line(Shape):
         return None
 
 
-
 class Rectangle(Shape):
 
-    def __init__(self, start_point: tuple[int,int], end_point: tuple[int,int], color = DEFAULT_COLOR, corner_type = 's'):
+    def __init__(self, start_point: tuple[int, int], end_point: tuple[int, int], color = DEFAULT_COLOR, corner_type='Sharp'):
         super().__init__(start_point, end_point)
         self.corner_type = corner_type
 
+
     def draw(self, window):
         """
-            It draws the shape
+        It draws the shape
         """
-        self.id = window.canvas.draw_rectangle(self.start_point, self.end_point, line_color = self.colour, line_width=self.pen_width)
+        radius = 0 if self.corner_type == 'Sharp' else ROUND_RADIUS
+        x1, y1 = self.start_point
+        x2, y2 = self.end_point
+
+        # Calculate the points for the rounded rectangle
+        segments = 30  # Number of segments to approximate the circular arc
+        points = []
+
+        for i in range(segments):
+            angle = math.pi / 2 * (segments - i) / segments
+            points.append((x1 + radius - radius * math.sin(angle),
+                        y1 + radius + radius * math.cos(angle)))
+
+        for i in range(segments):
+            angle = math.pi / 2 * i / segments
+            points.append((x2 - radius + radius * math.sin(angle),
+                        y1 + radius + radius * math.cos(angle)))
+
+        for i in range(segments):
+            angle = math.pi / 2 * (segments - i) / segments
+            points.append((x2 - radius + radius * math.sin(angle),
+                        y2 - radius - radius * math.cos(angle)))
+
+        for i in range(segments):
+            angle = math.pi / 2 * i / segments
+            points.append((x1 + radius - radius * math.sin(angle),
+                        y2 - radius - radius * math.cos(angle)))
+
+        window.canvas.draw_polygon(
+            points, fill_color="", line_color=self.colour, line_width=self.pen_width)
 
     # def move(self, new_point: tuple[int,int]):
     #     '''
@@ -107,11 +139,11 @@ class Rectangle(Shape):
     #     self.end_point = [new_point[0] + self.width, new_point[1] +  self.height]
     #     self.centroid = [(new_point[0] + self.end_point[0]) / 2 , (new_point[1] + self.end_point[1]) / 2]
 
-    def detect_selection(self, point: tuple[int,int]):
+    def detect_selection(self, point: tuple[int, int]):
         """
             It detects whether the click is inside the shape is or not
         """
-        x,y = point
+        x, y = point
 
         minx = min(self.start_point[0], self.end_point[0])
         miny = min(self.start_point[1], self.end_point[1])

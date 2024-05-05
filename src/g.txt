@@ -1,7 +1,0 @@
-begin
-begin
-rect 207.5 304.75 383.5 161.75 black s
-rect 451.5 273.75 638.5 96.75 black s
-end
-line 118.25 430.25 129.25 219.25 black
-end

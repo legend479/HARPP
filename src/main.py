@@ -4,6 +4,33 @@ import PySimpleGUI as sg
 PEN_SIZE = 5
 PEN_COLOR = 'black'
 
+def show_edit_popup(drawable):
+    layout = [
+        [sg.Text("Edit Object")],
+        [sg.Text("Color"), sg.InputText(drawable.colour, key="-COLOR-")],
+        [sg.Text("Width"), sg.InputText(drawable.pen_width, key="-WIDTH-")],
+        
+        [sg.Text("Corner Type"), sg.DropDown(["Round","Sharp"],default_value=drawable.corner_type, key="-TYPE-")] if isinstance(drawable, Rectangle) else [],
+            
+        [sg.Button("Save", key="-SAVE-"), sg.Button("Cancel", key="-CANCEL-")]
+    ]
+
+    window = sg.Window("Edit Object", layout)
+
+    while True:
+        event, values = window.read()
+        if event == sg.WIN_CLOSED:
+            break
+        if event == "-SAVE-":            
+            drawable.colour = values["-COLOR-"]
+            drawable.pen_width = values["-WIDTH-"]
+            if isinstance(drawable, Rectangle):
+                drawable.corner_type = values["-TYPE-"]           
+            break
+        if event == "-CANCEL-":
+            break
+
+    window.close()
 
 def main():
     window = win.Window()
@@ -12,6 +39,7 @@ def main():
     # drawing_rect = False
     selected_objects = [] # Stores the current objects
     window.canvas.bind("<Motion>", '-Motion-')
+    window.canvas.bind("<Button-3>", '-RightClick-')
     group_mode = False
     ungroup_mode = False
     selected_indices = set()
@@ -212,6 +240,15 @@ def main():
                 print(drawables)
                 for drawable in drawables:
                     drawable.draw(window)
+        if event=="-CANVAS--RightClick-":
+            click_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
+            for drawable in drawables:
+                if drawable.detect_selection(click_pt):
+                    show_edit_popup(drawable)
+                    break
+                       
+            
+        
         if event == '-CLEAR-':
             drawables = []
             window.canvas.erase()
