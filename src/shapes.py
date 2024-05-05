@@ -20,6 +20,17 @@ class Shape(Object):
         self.pen_width = PEN_SIZE
         self.id = None
 
+    def move(self, delta):
+        print(delta)
+        self.start_point[0] += delta[0]
+        self.start_point[1] += delta[1]
+
+        self.end_point[0] += delta[0]
+        self.end_point[1] += delta[1]
+
+        self.centroid[0] += delta[0]
+        self.centroid[1] += delta[1]
+
 
 
 class Line(Shape):
@@ -41,13 +52,13 @@ class Line(Shape):
         """
         self.id = window.canvas.draw_line(self.start_point, self.end_point, color = self.colour, width=self.pen_width)
 
-    def move(self, new_point: tuple[int,int]):
-        '''
-        For now, the top left corner will be where the mouse click happens
-        '''
-        self.start_point = new_point
-        self.end_point = [new_point[0] + self.width, new_point[1] + self.height]
-        self.centroid = [(self.start_point[0] + self.end_point[0]) / 2 , (self.start_point[1] + self.end_point[1]) / 2]
+    # def move(self, new_point: tuple[int,int]):
+    #     '''
+    #     For now, the top left corner will be where the mouse click happens
+    #     '''
+    #     self.start_point = new_point
+    #     self.end_point = [new_point[0] + self.width, new_point[1] + self.height]
+    #     self.centroid = [(self.start_point[0] + self.end_point[0]) / 2 , (self.start_point[1] + self.end_point[1]) / 2]
 
     def detect_selection(self, point: tuple[int,int]):
         """
@@ -77,12 +88,12 @@ class Rectangle(Shape):
         """
         self.id = window.canvas.draw_rectangle(self.start_point, self.end_point, line_color = self.colour, line_width=self.pen_width)
 
-    def move(self, new_point: tuple[int,int]):
-        '''
-        For now, the top left corner will be where the mouse click happens'''
-        self.start_point = new_point
-        self.end_point = [new_point[0] + self.width, new_point[1] +  self.height]
-        self.centroid = [(new_point[0] + self.end_point[0]) / 2 , (new_point[1] + self.end_point[1]) / 2]
+    # def move(self, new_point: tuple[int,int]):
+    #     '''
+    #     For now, the top left corner will be where the mouse click happens'''
+    #     self.start_point = new_point
+    #     self.end_point = [new_point[0] + self.width, new_point[1] +  self.height]
+    #     self.centroid = [(new_point[0] + self.end_point[0]) / 2 , (new_point[1] + self.end_point[1]) / 2]
 
     def detect_selection(self, point: tuple[int,int]):
         """

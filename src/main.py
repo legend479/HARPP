@@ -98,6 +98,7 @@ def main():
                         # window.canvas.draw_line(start_pt, end_pt, color=PEN_COLOR, width=PEN_SIZE)
                         match drawing_object:
                             case 1:
+                                print("TT")
                                 drawables.append(Line(start_pt, end_pt))
                             case 2:
                                 drawables.append(Rectangle(start_pt, end_pt))
@@ -113,7 +114,9 @@ def main():
                                 break
 
                     else:
-                        selected_group.move(click_pt)
+                        delta = [values["-CANVAS-"][0] - selected_group.centroid[0], values["-CANVAS-"][1] - selected_group.centroid[1]]
+
+                        selected_group.move(delta)
                         selected_group = None
                         selected_object = None
                         window.canvas.erase()
@@ -121,7 +124,9 @@ def main():
                             drawable.draw(window)
         
         if selected_group :
-            selected_group.move(values["-CANVAS-"])
+            delta = [values["-CANVAS-"][0] - selected_group.centroid[0], values["-CANVAS-"][1] - selected_group.centroid[1]]
+
+            selected_group.move(delta)
             window.canvas.erase()
             for drawable in drawables:
                 drawable.draw(window)

@@ -1,9 +1,13 @@
 from typing import List, Optional
 from shapes import Shape
+from object import *
 
-class Group(Shape):
+class Group(Object):
     def __init__(self, objects: List[Shape], parent: Optional['Group'] = None):
         self.objects = objects
+        self.centroid = [sum([obj.centroid[0] for obj in objects]) / len(objects) , sum([obj.centroid[1] for obj in objects]) / len(objects)]
+        
+        
         # self.parent = parent
         # self.children = []  # List of child groups
         # for obj in objects:
@@ -26,7 +30,7 @@ class Group(Shape):
         for obj in self.objects:
             obj.draw(window)
 
-    def move(self, new_point: tuple[int, int]):
+    def move(self, delta: tuple[int, int]):
         # dx = new_point[0] - self.start_point[0]
         # dy = new_point[1] - self.start_point[1]
         # for obj in self.objects:
@@ -36,7 +40,10 @@ class Group(Shape):
         #     child.move(self.start_point)
 
         for obj in self.objects:
-            obj.move(new_point)
+            obj.move(delta)
+
+        self.centroid[0] += delta[0]
+        self.centroid[1] += delta[1]
 
     def detect_selection(self, point: tuple[int, int]):
         # x, y = point
