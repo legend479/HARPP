@@ -26,7 +26,7 @@ class Line(Shape):
     #     super().__init__(height,width,centoid)
     # pass
 
-    def __init__(self, start_point, end_point):
+    def __init__(self, start_point: tuple[int,int], end_point: tuple[int,int]):
         super().__init__(start_point, end_point)
         diff = [start_point[0] - end_point[0], start_point[1] - end_point[1]]
         if diff[1] != 0:
@@ -37,7 +37,7 @@ class Line(Shape):
     def draw(self, window):
         self.id = window.canvas.draw_line(self.start_point, self.end_point, color = self.colour, width=PEN_SIZE)
 
-    def move(self, new_point):
+    def move(self, new_point: tuple[int,int]):
         '''
         For now, the top left corner will be where the mouse click happens
         '''
@@ -45,19 +45,18 @@ class Line(Shape):
         self.end_point = [new_point[0] + self.width, new_point[1] + self.height]
         self.centroid = [(self.start_point[0] + self.end_point[0]) / 2 , (self.start_point[1] + self.end_point[1]) / 2]
 
-    def detect_selection(self, point):
+    def detect_selection(self, point: tuple[int,int]):
         x,y = point
         if self.orientation == INF:
             if abs( y-self.start_point[1]) <= EPSILON and (x <= self.start_point[0] and x >= self.end_point[0] or x >= self.start_point[0] and x <= self.end_point[0]):
                 return self
         else:
             if abs((self.orientation*y - x) -  (self.orientation*self.end_point[1] - self.end_point[0])) <= EPSILON:
-                print("Selected")
                 return self
 
         return None
 
-    def contains_point(self, point):
+    def contains_point(self, point: tuple[int,int]):
         x, y = point
         x1, y1 = self.start_point
         x2, y2 = self.end_point
@@ -70,27 +69,27 @@ class Rectangle(Shape):
     #     self.type = 0
     # pass
 
-    def __init__(self, start_point, end_point, corner_type = 's'):
+    def __init__(self, start_point: tuple[int,int], end_point: tuple[int,int], corner_type = 's'):
         super().__init__(start_point, end_point)
         self.corner_type = corner_type
 
     def draw(self, window):
         self.id = window.canvas.draw_rectangle(self.start_point, self.end_point, line_color = self.colour, line_width=PEN_SIZE)
 
-    def move(self, new_point):
+    def move(self, new_point: tuple[int,int]):
         '''
         For now, the top left corner will be where the mouse click happens'''
         self.start_point = new_point
         self.end_point = [new_point[0] + self.width, new_point[1] +  self.height]
         self.centroid = [(new_point[0] + self.end_point[0]) / 2 , (new_point[1] + self.end_point[1]) / 2]
 
-    def detect_selection(self, point):
+    def detect_selection(self, point: tuple[int,int]):
         x,y = point
         if x <= self.end_point[0] and x >= self.start_point[0] and y <= self.start_point[1] and y >= self.end_point[1]:
             return self
         pass
 
-    def contains_point(self, point):
+    def contains_point(self, point: tuple[int,int]):
         x, y = point
         x1, y1 = self.start_point
         x2, y2 = self.end_point
@@ -115,7 +114,7 @@ class Group(Shape):
         for obj in self.objects:
             obj.draw(window)
 
-    def move(self, dx, dy):
+    def move(self, dx: int, dy: int):
         for obj in self.objects:
             obj.move(dx, dy)
         self.calculate_bounding_box()
