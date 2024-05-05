@@ -54,8 +54,10 @@ def main():
                     for drawable in drawables:
                         drawable.draw(window)
 
-        if group_mode:
+                    window.window["GROUP"].update(text = "Group")
 
+        if group_mode:
+            window.window["-GROUP-"].update(text = "Done")
             if event == "-CANVAS-":
                 click_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
                 for i, drawable in enumerate(drawables):
