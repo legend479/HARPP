@@ -56,11 +56,6 @@ class Line(Shape):
 
         return None
 
-    def contains_point(self, point: tuple[int,int]):
-        x, y = point
-        x1, y1 = self.start_point
-        x2, y2 = self.end_point
-        return x1 <= x <= x2 and y1 <= y <= y2
 
 
 class Rectangle(Shape):
@@ -89,32 +84,32 @@ class Rectangle(Shape):
             return self
         pass
 
-    def contains_point(self, point: tuple[int,int]):
-        x, y = point
-        x1, y1 = self.start_point
-        x2, y2 = self.end_point
-        return x1 <= x <= x2 and y1 <= y <= y2
-
-class Group(Shape):
-    def __init__(self, objects: List[Shape]):
-        self.objects = objects
-        self.start_point = None
-        self.end_point = None
-        self.calculate_bounding_box()
-
-    def calculate_bounding_box(self):
-        min_x = min(obj.start_point[0] for obj in self.objects)
-        min_y = min(obj.start_point[1] for obj in self.objects)
-        max_x = max(obj.end_point[0] for obj in self.objects)
-        max_y = max(obj.end_point[1] for obj in self.objects)
-        self.start_point = (min_x, min_y)
-        self.end_point = (max_x, max_y)
-
-    def draw(self, window):
-        for obj in self.objects:
-            obj.draw(window)
-
-    def move(self, dx: int, dy: int):
-        for obj in self.objects:
-            obj.move(dx, dy)
-        self.calculate_bounding_box()
+#
+# class Group(Shape):
+#     def __init__(self, objects: List[Shape]):
+#         self.objects = objects
+#         self.start_point = None
+#         self.end_point = None
+#         self.calculate_bounding_box()
+#
+#     def calculate_bounding_box(self):
+#         min_x = min(obj.start_point[0] for obj in self.objects)
+#         min_y = min(obj.start_point[1] for obj in self.objects)
+#         max_x = max(obj.end_point[0] for obj in self.objects)
+#         max_y = max(obj.end_point[1] for obj in self.objects)
+#         self.start_point = (min_x, min_y)
+#         self.end_point = (max_x, max_y)
+#
+#     def draw(self, window):
+#         for obj in self.objects:
+#             obj.draw(window)
+#
+#     def move(self, dx: int, dy: int):
+#         for obj in self.objects:
+#             obj.move(dx, dy)
+#         self.calculate_bounding_box()
+#     def detect_selection(self, point: tuple[int,int]):
+#         x,y = point
+#         if x <= self.end_point[0] and x >= self.start_point[0] and y <= self.start_point[1] and y >= self.end_point[1]:
+#             return self
+#         pass
