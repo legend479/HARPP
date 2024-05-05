@@ -6,9 +6,14 @@ PEN_COLOR = 'black'
 
 def main():
     window = win.Window()
+    drawables = [] # Collection of all groups and individual objects.
     drawing_line = False
     drawing_rect = False
     while True:
+        for drawable in drawables:
+            drawable.draw(window)
+            print("YES")
+        
         event, values = window.event()
         print(event, values)
         if event == sg.WIN_CLOSED:
@@ -30,7 +35,8 @@ def main():
                 start_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
             else:
                 end_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
-                window.canvas.draw_line(start_pt, end_pt, color=PEN_COLOR, width=PEN_SIZE)
+                # window.canvas.draw_line(start_pt, end_pt, color=PEN_COLOR, width=PEN_SIZE)
+                drawables.append(Line(start_pt, end_pt))
                 drawing_line = False
         
         if drawing_rect and event == "-CANVAS-":
@@ -38,8 +44,12 @@ def main():
                 start_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
             else:
                 end_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
-                window.canvas.draw_rectangle(start_pt, end_pt, line_color=PEN_COLOR, line_width=PEN_SIZE)
+                # window.canvas.draw_rectangle(start_pt, end_pt, line_color=PEN_COLOR, line_width=PEN_SIZE)
+                drawables.append(Rectangle(start_pt, end_pt))
                 drawing_rect = False
+
+        
+        window.canvas.erase() # So that window refreshes everytime, so that we can delete objects if we need to.
                 
     
 if __name__ == "__main__":

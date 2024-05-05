@@ -3,7 +3,7 @@ from object import Object
 
 PEN_SIZE = 5
 
-DEFAULT_COLOR = (0,0,0)
+DEFAULT_COLOR = 'black'
 CORNER_TYPE = ["pointed", "CURVY"]
 
 
@@ -44,7 +44,7 @@ class Rectangle(Shape):
         self.corner_type = corner_type
 
     def draw(self, window):
-        window.canvas.draw_rectangle(self.start_point, self.end_point, color = self.colour, width=PEN_SIZE)
+        window.canvas.draw_rectangle(self.start_point, self.end_point, line_color = self.colour, line_width=PEN_SIZE)
 
     def move(self, dx, dy):
         self.start_point += [dx, dy]
