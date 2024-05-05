@@ -1,8 +1,10 @@
 import PySimpleGUI as sg
 from object import Object
 from collections import *
-PEN_SIZE = 5
 from typing import List
+PEN_SIZE = 5
+EPSILON = 10
+INF = 100000000000000000000000000000
 DEFAULT_COLOR = 'black'
 CORNER_TYPE = ["pointed", "CURVY"]
 
@@ -26,6 +28,11 @@ class Line(Shape):
 
     def __init__(self, start_point, end_point):
         super().__init__(start_point, end_point)
+        diff = [start_point[0] - end_point[0], start_point[1] - end_point[1]]
+        if diff[1] != 0:
+            self.orientation = diff[0]/diff[1]
+        else:
+            self.orientation = INF
 
     def draw(self, window):
         self.id = window.canvas.draw_line(self.start_point, self.end_point, color = self.colour, width=PEN_SIZE)
@@ -39,8 +46,17 @@ class Line(Shape):
         self.centroid = [(self.start_point[0] + self.end_point[0]) / 2 , (self.start_point[1] + self.end_point[1]) / 2]
 
     def detect_selection(self, point):
-        print("Selected")
-        return self
+        x,y = point
+        if self.orientation == INF:
+            if abs( y-self.start_point[1]) <= EPSILON and (x <= self.start_point[0] and x >= self.end_point[0] or x >= self.start_point[0] and x <= self.end_point[0]):
+                return self
+        else:
+            if abs((self.orientation*y - x) -  (self.orientation*self.end_point[1] - self.end_point[0])) <= EPSILON:
+                print("Selected")
+                return self
+
+        return None
+
     def contains_point(self, point):
         x, y = point
         x1, y1 = self.start_point
@@ -65,8 +81,15 @@ class Rectangle(Shape):
         '''
         For now, the top left corner will be where the mouse click happens'''
         self.start_point = new_point
-        self.end_point = new_point + [self.width, self.height]
+        self.end_point = [new_point[0] + self.width, new_point[1] +  self.height]
         self.centroid = [(new_point[0] + self.end_point[0]) / 2 , (new_point[1] + self.end_point[1]) / 2]
+
+    def detect_selection(self, point):
+        x,y = point
+        if x <= self.end_point[0] and x >= self.start_point[0] and y <= self.start_point[1] and y >= self.end_point[1]:
+            return self
+        pass
+
     def contains_point(self, point):
         x, y = point
         x1, y1 = self.start_point

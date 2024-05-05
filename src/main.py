@@ -77,6 +77,7 @@ def main():
         #         # window.canvas.draw_rectangle(start_pt, end_pt, line_color=PEN_COLOR, line_width=PEN_SIZE)
         #         drawables.append(Rectangle(start_pt, end_pt))
         #         drawing_rect = False
+
         # Handle object selection
         if event == "-CANVAS-" and not drawing_object:
             cursor_pos = values["-CANVAS-"]
@@ -112,6 +113,8 @@ def main():
 
                 else:
                     selected_group.move(click_pt)
+                    selected_group = None
+                    selected_object = None
                     window.canvas.erase()
                     for drawable in drawables:
                         drawable.draw(window)
