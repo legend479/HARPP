@@ -1,7 +1,5 @@
 from dependencies import *
 import PySimpleGUI as sg
-from export import Exporter
-from group import  Group
 
 PEN_SIZE = 5
 PEN_COLOR = 'black'
