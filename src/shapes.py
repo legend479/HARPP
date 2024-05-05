@@ -19,6 +19,15 @@ class Shape(Object):
         self.colour = DEFAULT_COLOR
         self.id = None
 
+    def edit(self, color, start_point, end_point):
+        self.start_point = start_point
+        self.end_point = end_point
+        self.colour = color
+        self.width = end_point[0] - start_point[0]
+        self.height = end_point[1] - start_point[1]
+        self.centroid = [(start_point[0] + end_point[0]) / 2 , (start_point[1] + end_point[1]) / 2]
+        
+
 
 
 class Line(Shape):
@@ -61,6 +70,14 @@ class Line(Shape):
         x1, y1 = self.start_point
         x2, y2 = self.end_point
         return x1 <= x <= x2 and y1 <= y <= y2
+    
+    def edit(self, color, start_point, end_point):
+        super.edit(color, start_point, end_point)
+        diff = [start_point[0] - end_point[0], start_point[1] - end_point[1]]
+        if diff[1] != 0:
+            self.orientation = diff[0]/diff[1]
+        else:
+            self.orientation = INF
 
 
 class Rectangle(Shape):
@@ -94,6 +111,10 @@ class Rectangle(Shape):
         x1, y1 = self.start_point
         x2, y2 = self.end_point
         return x1 <= x <= x2 and y1 <= y <= y2
+
+    def edit(self, color, start_point, end_point, corner_type):
+        super().edit(color, start_point, end_point)
+        self.corner_type = corner_type
 
 class Group(Shape):
     def __init__(self, objects: List[Shape]):
