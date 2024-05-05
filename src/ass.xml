@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>
+<drawing>
+  <rectangle>
+    <upper-left>
+      <x>163</x>
+      <y>266</y>
+    </upper-left>
+    <lower-right>
+      <x>394</x>
+      <y>495</y>
+    </lower-right>
+    <color>black</color>
+    <corner>square</corner>
+  </rectangle>
+  <rectangle>
+    <upper-left>
+      <x>387</x>
+      <y>251</y>
+    </upper-left>
+    <lower-right>
+      <x>548</x>
+      <y>426</y>
+    </lower-right>
+    <color>black</color>
+    <corner>square</corner>
+  </rectangle>
+</drawing>

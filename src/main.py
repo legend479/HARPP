@@ -107,7 +107,9 @@ def main():
                 end_pt = None
             if event == '-EXPORT-':
                 exporter = Exporter(drawables)
-                exporter.export_to_xml('drawing.xml')
+                file_path = sg.popup_get_file('Save As', save_as=True, file_types=(("XML Files", "*.xml"),))
+                if file_path:
+                    exporter.export_to_xml(file_path+'.xml')
 
             if event == "-DELETE-":
                 if selected_group:

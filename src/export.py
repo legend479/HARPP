@@ -18,8 +18,13 @@ class Exporter:
         tree = ET.ElementTree(root)
         xml_str = ET.tostring(root, encoding='utf-8')
         xml_pretty_str = minidom.parseString(xml_str).toprettyxml(indent="  ")
-        with open(file_path, "w") as file:
-            file.write(xml_pretty_str)
+        try:
+            with open(file_path, "w") as file:
+                file.write(xml_pretty_str)
+            return True  # Export successful
+        except Exception as e:
+            print(f"Error exporting to XML: {e}")
+            return False
 
     def import_from_xml(self, file_path: str):
         drawables = []
