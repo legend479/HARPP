@@ -16,6 +16,8 @@ def main():
     drawing_object = 0 # 0 refers to not drawing. 1 refers to line and 2 refers to rectangle
     start_pt = None
     end_pt = None
+    selected_group = None
+    selected_object = None
     
     while True:
         # for drawable in drawables:
@@ -73,8 +75,17 @@ def main():
                     drawing_object = 0
 
             else:
-                # iterate through the drawables to detect selection clicks
-                # do any recursive traversal
+                click_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
+                if not selected_object:
+                    for drawable in drawables:
+                        selected_object = drawable.detect_selection(click_pt)
+                        if selected_object:
+                            selected_group = drawable
+                            break
+
+                else:
+                    selected_group.move(click_pt)
+
                 pass
         
         if event == '-CANVAS--Motion-' and start_pt:

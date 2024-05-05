@@ -22,6 +22,9 @@ class Object():
     def __init__(self, start_point, end_point):
         # Calculate height, width and centroid
         # self.bounding_box
+        self.width = end_point[0] - start_point[0]
+        self.height = end_point[1] - start_point[1]
+        self.centroid = [(start_point[0] + end_point[0]) / 2 , (start_point[1] + end_point[1]) / 2]
         self.start_point = start_point
         self.end_point = end_point
         
