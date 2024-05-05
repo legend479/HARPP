@@ -85,7 +85,9 @@ def main():
 
                 else:
                     selected_group.move(click_pt)
-
+                    window.canvas.erase()
+                    for drawable in drawables:
+                        drawable.draw(window)
                 pass
         
         if event == '-CANVAS--Motion-' and start_pt:
