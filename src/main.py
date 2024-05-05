@@ -1,4 +1,4 @@
-import window as win
+from dependencies import *
 import PySimpleGUI as sg
 
 PEN_SIZE = 5
