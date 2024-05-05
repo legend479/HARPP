@@ -2,15 +2,21 @@ from dependencies import *
 import PySimpleGUI as sg
 
 PEN_SIZE = 5
-PEN_COLOR = 'black'
+PEN_COLOR = 'black'    
+
 
 def main():
     window = win.Window()
     drawables = [] # Collection of all groups and individual objects.
     # drawing_line = False
     # drawing_rect = False
+    
+    window.canvas.bind("<Motion>", '-Motion-')
 
     drawing_object = 0 # 0 refers to not drawing. 1 refers to line and 2 refers to rectangle
+    start_pt = None
+    end_pt = None
+    
     while True:
         for drawable in drawables:
             drawable.draw(window)
@@ -59,18 +65,30 @@ def main():
                 else:
                     end_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
                     # window.canvas.draw_line(start_pt, end_pt, color=PEN_COLOR, width=PEN_SIZE)
-                    if drawing_object == 1:
-                        drawables.append(Line(start_pt, end_pt))
-                    elif drawing_object == 2:
-                        drawables.append(Rectangle(start_pt, end_pt))
+                    match drawing_object:
+                        case 1:
+                            drawables.append(Line(start_pt, end_pt))
+                        case 2:
+                            drawables.append(Rectangle(start_pt, end_pt))
                     drawing_object = 0
 
             else:
                 # iterate through the drawables to detect selection clicks
                 # do any recursive traversal
-
+                pass
         
-        window.canvas.erase() # So that window refreshes everytime, so that we can delete objects if we need to.
+        if event == '-CANVAS--Motion-' and start_pt:
+            window.canvas.erase()
+            cursor_pos = values["-CANVAS-"]
+            match drawing_object:
+                case 1:                    
+                    window.canvas.draw_line(start_pt, cursor_pos, color=PEN_COLOR, width=PEN_SIZE)
+                case 2:
+                    window.canvas.draw_rectangle(start_pt, cursor_pos, line_color=PEN_COLOR, line_width=PEN_SIZE)
+        
+        if event == '-CLEAR-':
+            drawables = []
+            window.canvas.erase()
                 
     
 if __name__ == "__main__":
