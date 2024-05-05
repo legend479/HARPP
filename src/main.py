@@ -18,9 +18,9 @@ def main():
     end_pt = None
     
     while True:
-        for drawable in drawables:
-            drawable.draw(window)
-            print("YES")
+        # for drawable in drawables:
+        #     drawable.draw(window)
+        #     print("YES")
         
         event, values = window.event()
         print(event, values)
@@ -79,6 +79,8 @@ def main():
         
         if event == '-CANVAS--Motion-' and start_pt:
             window.canvas.erase()
+            for drawable in drawables:
+                drawable.draw(window)
             cursor_pos = values["-CANVAS-"]
             match drawing_object:
                 case 1:                    
