@@ -41,7 +41,7 @@ We will follow the Gitflow branching strategy, which consists of the following b
 
 - Prakhar Jain
 
-- Harpreet
+- Harpreet: 
 
 - Raveesh
 

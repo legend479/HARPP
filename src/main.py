@@ -1,5 +1,7 @@
 from dependencies import *
 import PySimpleGUI as sg
+from export import Exporter
+
 
 PEN_SIZE = 5
 PEN_COLOR = 'black'    
@@ -41,6 +43,9 @@ def main():
             drawing_object = 2 if drawing_object != 2 else 0
             start_pt = None
             end_pt = None
+        if event == '-EXPORT-':
+            exporter = Exporter(drawables)
+            exporter.export_to_xml('drawing.xml')
         
         # if drawing_line and event == "-CANVAS-":
         #     if start_pt is None:
