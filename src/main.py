@@ -120,7 +120,13 @@ def main():
                         drawable.draw(window)
 
 
-                pass
+        if selected_object:
+            if event == "-CANVAS--Motion-":
+                cursor_pos = values["-CANVAS-"]
+                selected_object.move(cursor_pos)
+                window.canvas.erase()
+                
+            
         
         if event == '-CANVAS--Motion-' and start_pt:
             window.canvas.erase()
