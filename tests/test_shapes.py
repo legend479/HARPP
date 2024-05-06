@@ -1,9 +1,11 @@
 import os
 import sys
+
+sys.path.append(os.path.abspath('../src'))
+
 from shapes import Line, Rectangle
 from constants import DEFAULT_COLOR, DEFAULT_PEN_SIZE
 
-sys.path.append(os.path.abspath('../src'))
 
 def test_line_init():
     start_point = (0, 0)

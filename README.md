@@ -41,7 +41,7 @@ To get started with the application, follow these steps:
    - Using `python3 -m venv env`
    - Activate the virtual environment: `source env/bin/activate`
 3. Download requirements: `pip install -r requirements.txt`
-4. Run the application: `python3 main.py`
+4. Run the application: `python3 src/main.py`
 ***
 ## User's Guide
 

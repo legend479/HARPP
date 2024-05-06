@@ -1,6 +1,3 @@
 PySimpleGUI
 xml-python
 typing
-sys
-os
-random
