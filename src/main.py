@@ -7,9 +7,9 @@ import random
 def show_menu(cursor_pos):
     layout = [
         [sg.Button("Edit", button_color=("grey", ""))],
-        [sg.Button("Delete" ,button_color=("grey", ""))],
-        [sg.Button("Copy&Paste" ,button_color=("grey", ""))],
-        [sg.Button("Cancel" ,button_color=("grey", "black"))]
+        [sg.Button("Delete", button_color=("grey", ""))],
+        [sg.Button("Copy&Paste", button_color=("grey", ""))],
+        [sg.Button("Cancel", button_color=("grey", "black"))]
     ]
 
     window = sg.Window("Menu", layout, location=cursor_pos,
@@ -32,7 +32,7 @@ def show_edit_popup(drawable):
         [sg.Text("Width"), sg.InputText(drawable.pen_width, key="-WIDTH-")],
 
         [sg.Text("Corner Type"), sg.DropDown(["Round", "Sharp"], default_value=drawable.corner_type,
-                                        key="-TYPE-")] if isinstance(drawable, Rectangle) else [],
+                                             key="-TYPE-")] if isinstance(drawable, Rectangle) else [],
 
         [sg.Button("Save", key="Save"), sg.Button("Cancel", key="-CANCEL-")]
     ]
@@ -54,6 +54,7 @@ def show_edit_popup(drawable):
 
     window.close()
 
+
 def update_canvas(window, drawables):
     window.canvas.erase()
     for drawable in drawables:
@@ -72,16 +73,17 @@ def main():
     group_mode = False
     ungroup_mode = False
     selected_indices = set()
-    color_mapping = {}
     drawing_object = 0  # 0 refers to not drawing. 1 refers to line and 2 refers to rectangle
     start_pt = None
     groups = []
     end_pt = None
     selected_group = None
     selected_object = None
+    unsaved_changes = False
+
     def update_colour_recursively(objects, c_map, color):
         for obj in objects:
-            if isinstance(obj, (Line, Rectangle)) and hasattr(obj, 'colour'):
+            if isinstance(obj, Shape) and hasattr(obj, 'colour'):
                 obj.colour = c_map.get(obj, color)
             elif isinstance(obj, Group):
                 update_colour_recursively(obj.objects, c_map, color)
@@ -89,6 +91,7 @@ def main():
     while True:
         event, values = window.event()
         print(event, values, group_mode, selected_objects)
+
         if event == sg.WIN_CLOSED:
             break
         if event == "-GROUP-":
@@ -98,10 +101,11 @@ def main():
                 if len(selected_indices) > 0:
                     for friend in selected_indices:
                         obj = drawables[friend]
-                        if isinstance(obj, (Line, Rectangle)) and hasattr(obj, 'colour'):
+                        if isinstance(obj, Shape) and hasattr(obj, 'colour'):
                             obj.colour = c_map.get(obj, DEFAULT_COLOR)
                         elif isinstance(obj, Group):
-                            update_colour_recursively(obj.objects, c_map, DEFAULT_COLOR)
+                            update_colour_recursively(
+                                obj.objects, c_map, DEFAULT_COLOR)
                         new_friends.append(drawables[friend])
 
                     drawables.append(Group(new_friends))
@@ -114,9 +118,9 @@ def main():
                         drawables.pop(friend)
 
                     selected_indices = set()
-                    color_mapping = {}
                     c_map = {}
                     update_canvas(window, drawables)
+                    unsaved_changes = True
 
                 window.window["-GROUP-"].update(text="Group")
 
@@ -126,32 +130,28 @@ def main():
                 click_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
                 for i, drawable in enumerate(drawables):
                     if drawable.detect_selection(click_pt):
-                        # if isinstance(drawable, (Line, Rectangle))
-                        # and hasattr(drawable, 'colour'):
-                        #     c_map[drawable] = drawable.colour
-                        # elif isinstance(drawable, Group):
-                        #     update_colour_recursively(drawable.objects, c_map, DEFAULT_COLOR)
+
                         if i not in selected_indices:
                             selected_indices.add(i)
-                            if (isinstance(drawable, (Line, Rectangle))
+                            if (isinstance(drawable, Shape)
                                     and hasattr(drawable, 'colour')):
                                 drawable.colour = "yellow"
                             elif isinstance(drawable, Group):
-                                update_colour_recursively(drawable.objects, c_map, "yellow")
-                            # color_mapping[i] = drawable.colour
-                            # drawable.colour = "yellow"
+                                update_colour_recursively(
+                                    drawable.objects, c_map, "yellow")
+
                         else:
                             selected_indices.remove(i)
-                            # del color_mapping[i]
                             obj = drawable
-                            if isinstance(obj, (Line, Rectangle)) and hasattr(obj, 'colour'):
+                            if isinstance(obj, Shape) and hasattr(obj, 'colour'):
                                 obj.colour = c_map.get(obj, DEFAULT_COLOR)
                             elif isinstance(obj, Group):
-                                update_colour_recursively(obj.objects, c_map, DEFAULT_COLOR)
+                                update_colour_recursively(
+                                    obj.objects, c_map, DEFAULT_COLOR)
 
                         update_canvas(window, drawables)
+                        unsaved_changes = True
                         break
-
 
         elif ungroup_mode:
             if event == "-CANVAS-":
@@ -167,6 +167,8 @@ def main():
                     drawables += drawables[ind].objects
                     drawables.pop(ind)
                     update_canvas(window, drawables)
+                    unsaved_changes = True
+
                     selected_group = None
                     selected_object = None
                     ungroup_mode = False
@@ -177,16 +179,13 @@ def main():
 
         else:
             if event == "-LINE-":
-                # drawing_line = True
-                # drawing_rect = False
-                # So that clicking the line button twice will exit the draw line state
+                window.window["-LINE-"].update(button_color="light blue")
                 drawing_object = 1 if drawing_object != 1 else 0
                 start_pt = None
                 end_pt = None
 
             if event == "-RECT-":
-                # drawing_line = False
-                # drawing_rect = True
+                window.window["-RECT-"].update(button_color="light blue")
                 drawing_object = 2 if drawing_object != 2 else 0
                 start_pt = None
                 end_pt = None
@@ -219,8 +218,10 @@ def main():
                         match drawing_object:
                             case 1:
                                 print("TT")
+                                window.window["-LINE-"].update(button_color="white")
                                 drawables.append(Line(start_pt, end_pt))
                             case 2:
+                                window.window["-RECT-"].update(button_color="white")
                                 drawables.append(Rectangle(start_pt, end_pt))
                         drawing_object = 0
 
@@ -242,6 +243,7 @@ def main():
                         selected_group = None
                         selected_object = None
                         update_canvas(window, drawables)
+                        unsaved_changes = True
 
         if selected_group:
             delta = [values["-CANVAS-"][0] - selected_group.centroid[0],
@@ -249,12 +251,14 @@ def main():
 
             selected_group.move(delta)
             update_canvas(window, drawables)
+            unsaved_changes = True
 
         if event == "-UNGROUP-":
             ungroup_mode = True
 
         if event == '-CANVAS--Motion-' and start_pt:
             update_canvas(window, drawables)
+            unsaved_changes = True
             cursor_pos = values["-CANVAS-"]
             match drawing_object:
                 case 1:
@@ -269,35 +273,41 @@ def main():
             if save_path:
                 exporter = Exporter(drawables)
                 exporter.save_to_file(save_path)
+                unsaved_changes = False
 
-        if event == "-OPEN-":
-            print("HIIII")
+        if event == "Open":
             open_path = sg.popup_get_file(
                 "Open Drawing", default_extension=".txt")
             if open_path:
                 print(open_path)
                 if len(drawables) > 0:
-                    confirm = sg.popup_yes_no(
-                        "You have unsaved changes. Do you want to continue?")
-                    if confirm == "No":
-                        continue
+                    if unsaved_changes:
+                        confirm = sg.popup_yes_no(
+                            "You have unsaved changes. Do you want to continue?")
+                        if confirm == "No":
+                            continue
+
                 exporter = Exporter([])
                 drawables = exporter.load_from_file(open_path)
                 update_canvas(window, drawables)
+                unsaved_changes = False
+
         if event == "-CANVAS--RightClick-":
             click_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
-            for i,drawable in enumerate(drawables):
-                if drawable.detect_selection(click_pt):
+            for i, drawable in enumerate(drawables):
+                if (selected_object:=drawable.detect_selection(click_pt)):
                     cursor_pos = values["-CANVAS-"]
                     # convert the cursor position to the window coordinates
                     cursor_pos = window.window["-CANVAS-"].Widget.canvasx(
                         cursor_pos[0]), window.window["-CANVAS-"].Widget.canvasy(cursor_pos[1])
                     cursor_pos = (window.window["-CANVAS-"].Widget.winfo_rootx(
                     ) + cursor_pos[0], window.window["-CANVAS-"].Widget.winfo_rooty()
-                                  + 600 - cursor_pos[1])
+                        + 600 - cursor_pos[1])
                     option = show_menu(cursor_pos)
+                    unsaved_changes = True
+
                     if option == "Edit":
-                        show_edit_popup(drawable)
+                        show_edit_popup(selected_object)
                     if option == "Delete":
                         drawables.pop(i)
                         update_canvas(window, drawables)
@@ -305,7 +315,7 @@ def main():
                         copy = drawable.get_duplicate()
                         drawables.append(copy)
                         update_canvas(window, drawables)
-                    # show_edit_popup(drawable)
+                        selected_group = copy
                     break
 
         if event == '-CLEAR-':

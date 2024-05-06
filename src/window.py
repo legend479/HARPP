@@ -43,7 +43,7 @@ class Window:
             sg.Button("Clear", size=BUTTON_SIZE,key="-CLEAR-",enable_events=True),
             sg.Push(),
             sg.Button("Save", size=BUTTON_SIZE),
-            sg.Button("Open", size=BUTTON_SIZE, enable_events=True, key="-OPEN-"),
+            sg.Button("Open", size=BUTTON_SIZE, enable_events=True, key="Open"),
 
         ]
 
@@ -56,10 +56,7 @@ class Window:
 
         self.window = sg.Window(
             "HARPP Editor", layout=self.layout, margins=(0, 0), finalize=True)
-        
-        
-        # attach menu bar
-         
+                 
 
     def display(self):
         while True:
