@@ -4,8 +4,9 @@ from shapes import *
 from export import Exporter
 from group import  Group
 from constants import *
+from typing import Union
 
-def show_menu(cursor_pos):
+def show_menu(cursor_pos: tuple[int, int]) -> Union[None, any]:
     layout = [
         [sg.Button("Edit")],
         [sg.Button("Delete")],
@@ -26,7 +27,7 @@ def show_menu(cursor_pos):
     return option
 
 
-def show_edit_popup(drawable):
+def show_edit_popup(drawable: object) -> None:
     layout = [
         [sg.Text("Edit Object")],
         [sg.Text("Color"), sg.InputText(drawable.colour, key="-COLOR-")],
@@ -56,7 +57,7 @@ def show_edit_popup(drawable):
     window.close()
 
 
-def update_canvas(window, drawables):
+def update_canvas(window: sg.Window, drawables: list[object]) -> None:
     window.canvas.erase()
     for drawable in drawables:
         drawable.draw(window)
