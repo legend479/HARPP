@@ -92,8 +92,16 @@ def main():
         event, values = window.event()
         print(event, values, group_mode, selected_objects)
 
-        if event == sg.WIN_CLOSED:
-            break
+        if event == sg.WIN_CLOSED :
+            if unsaved_changes:
+                confirm = sg.popup_yes_no(
+                    "You have unsaved changes. Do you want to continue?")
+                if confirm == "No":
+                    continue
+                else:
+                    break
+            else:
+                break
         if event == "-GROUP-":
             group_mode = not group_mode
             if not group_mode:
@@ -218,16 +226,16 @@ def main():
                         match drawing_object:
                             case 1:
                                 print("TT")
-                                window.window["-LINE-"].update(button_color="white")
+                                window.window["-LINE-"].update(button_color=sg.theme_button_color())
                                 drawables.append(Line(start_pt, end_pt))
                             case 2:
-                                window.window["-RECT-"].update(button_color="white")
+                                window.window["-RECT-"].update(button_color=sg.theme_button_color())
                                 drawables.append(Rectangle(start_pt, end_pt))
                         drawing_object = 0
 
                 else:
                     click_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
-                    if not selected_object:
+                    if not selected_group:
                         for drawable in drawables:
                             selected_object = drawable.detect_selection(
                                 click_pt)
@@ -306,11 +314,13 @@ def main():
                     option = show_menu(cursor_pos)
                     unsaved_changes = True
 
+                    # HERE
                     if option == "Edit":
                         show_edit_popup(selected_object)
                     if option == "Delete":
                         drawables.pop(i)
                         update_canvas(window, drawables)
+                        selected_group = None
                     if option == "Copy&Paste":
                         copy = drawable.get_duplicate()
                         drawables.append(copy)

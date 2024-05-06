@@ -5,8 +5,6 @@ import math
 from constants import *
 
 
-
-
 class Shape(Object):
     """
      This class is a parent class it sets the main template of all the classes making shapes
@@ -92,17 +90,27 @@ class Line(Shape):
         end_point = [self.end_point[0] + x_offset, self.end_point[1] + y_offset]
         return Line(start_point, end_point)
 
-
 class Rectangle(Shape):
+    """
+    A class representing a rectangle shape.
 
-    def __init__(self, start_point: tuple[int, int], end_point: tuple[int, int], color = DEFAULT_COLOR, corner_type='Sharp'):
+    Attributes:
+        start_point (tuple[int, int]): The starting point of the rectangle.
+        end_point (tuple[int, int]): The ending point of the rectangle.
+        color (str): The color of the rectangle. Default is DEFAULT_COLOR.
+        corner_type (str): The type of corners of the rectangle. Default is 'Sharp'.
+    """
+
+    def __init__(self, start_point: tuple[int, int], end_point: tuple[int, int], color=DEFAULT_COLOR, corner_type='Sharp'):
         super().__init__(start_point, end_point)
         self.corner_type = corner_type
 
-
     def draw(self, window):
         """
-        It draws the shape
+        Draw the rectangle shape.
+
+        Args:
+            window: The window to draw the shape on.
         """
         radius = 0 if self.corner_type == 'Sharp' else ROUND_RADIUS
         x1, y1 = self.start_point
@@ -115,30 +123,35 @@ class Rectangle(Shape):
         for i in range(segments):
             angle = math.pi / 2 * (segments - i) / segments
             points.append((x1 + radius - radius * math.sin(angle),
-                        y1 + radius + radius * math.cos(angle)))
+                           y1 + radius + radius * math.cos(angle)))
 
         for i in range(segments):
             angle = math.pi / 2 * i / segments
             points.append((x2 - radius + radius * math.sin(angle),
-                        y1 + radius + radius * math.cos(angle)))
+                           y1 + radius + radius * math.cos(angle)))
 
         for i in range(segments):
             angle = math.pi / 2 * (segments - i) / segments
             points.append((x2 - radius + radius * math.sin(angle),
-                        y2 - radius - radius * math.cos(angle)))
+                           y2 - radius - radius * math.cos(angle)))
 
         for i in range(segments):
             angle = math.pi / 2 * i / segments
             points.append((x1 + radius - radius * math.sin(angle),
-                        y2 - radius - radius * math.cos(angle)))
+                           y2 - radius - radius * math.cos(angle)))
 
         window.canvas.draw_polygon(
             points, fill_color="", line_color=self.colour, line_width=self.pen_width)
 
-
     def detect_selection(self, point: tuple[int, int]):
         """
-            It detects whether the click is inside the shape is or not
+        Detect whether the click is inside the rectangle shape or not.
+
+        Args:
+            point (tuple[int, int]): The coordinates of the click.
+
+        Returns:
+            Rectangle: The rectangle shape if the click is inside, None otherwise.
         """
         x, y = point
 
@@ -146,12 +159,18 @@ class Rectangle(Shape):
         miny = min(self.start_point[1], self.end_point[1])
         maxx = max(self.start_point[0], self.end_point[0])
         maxy = max(self.start_point[1], self.end_point[1])
+
         if x <= maxx and x >= minx and y <= maxy and y >= miny:
             return self
         return None
-        pass
 
     def get_duplicate(self):
+        """
+        Create a duplicate of the rectangle shape.
+
+        Returns:
+            Rectangle: A duplicate of the rectangle shape.
+        """
         x_offset = 20
         y_offset = 20
         start_point = [self.start_point[0] + x_offset, self.start_point[1] + y_offset]
