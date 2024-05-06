@@ -3,7 +3,7 @@ This module defines the Window class for managing the main window of the drawing
 """
 
 import PySimpleGUI as sg
-from constants import CANVAS_SIZE, BUTTON_SIZE, BIG_BUTTON_SIZE
+from constants import CANVAS_SIZE, BUTTON_SIZE, BIG_BUTTON_SIZE, DEFAULT_PEN_SIZE
 
 # Description: Editor window for the user to
 # interact with the program

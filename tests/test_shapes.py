@@ -5,7 +5,7 @@ import sys
 sys.path.append(os.path.abspath('../src'))
 print(os.path.dirname(os.path.dirname(__file__))+'/src/', sys.path)
 from shapes import Line, Rectangle
-from constants import DEFAULT_COLOR, PEN_SIZE
+from constants import DEFAULT_COLOR, DEFAULT_PEN_SIZE
 def test_line_init():
     start_point = (0, 0)
     end_point = (10, 10)
@@ -13,7 +13,7 @@ def test_line_init():
     assert line.start_point == start_point
     assert line.end_point == end_point
     assert line.colour == DEFAULT_COLOR
-    assert line.pen_width == PEN_SIZE
+    assert line.pen_width == DEFAULT_PEN_SIZE
     assert line.orientation == 1.0
 
 def test_line_move():
@@ -56,7 +56,7 @@ def test_rectangle_init():
     assert rect.start_point == start_point
     assert rect.end_point == end_point
     assert rect.colour == DEFAULT_COLOR
-    assert rect.pen_width == PEN_SIZE
+    assert rect.pen_width == DEFAULT_PEN_SIZE
     assert rect.corner_type == 'Sharp'
 
 def test_rectangle_move():

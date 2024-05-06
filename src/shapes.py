@@ -3,7 +3,7 @@ This module houses all shapes relevant to drawing
 """
 import math
 from object import Object
-from constants import DEFAULT_COLOR, PEN_SIZE, INF, ROUND_RADIUS, EPSILON
+from constants import DEFAULT_COLOR, DEFAULT_PEN_SIZE, INF, ROUND_RADIUS, EPSILON
 
 
 class Shape(Object):
@@ -171,4 +171,4 @@ class Rectangle(Shape):
         y_offset = 20
         start_point = [self.start_point[0] + x_offset, self.start_point[1] + y_offset]
         end_point = [self.end_point[0] + x_offset, self.end_point[1] + y_offset]
-        return Rectangle(start_point, end_point, self.colour, self.corner_type)
+        return Rectangle(start_point, end_point, self.colour, self.corner_type, self.pen_width)
