@@ -64,7 +64,7 @@ class Group(Object):
         duplicate_objects = [obj.get_duplicate() for obj in self.objects]
         return Group(duplicate_objects)
     def update_endpoints_randomly(self):
-        a = [10, 20]  # Example values for random update
+        a = [10, -10, -5, 5]  # Example values for random update
         for obj in self.objects:
             self._update_endpoints_recursive(obj, a)
 
