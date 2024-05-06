@@ -169,6 +169,10 @@ def main():
                     selected_group = None
                     selected_object = None
                     ungroup_mode = False
+                else:
+                    ungroup_mode = False
+                    selected_group = None
+                    selected_object = None
 
         else:
             if event == "-LINE-":
