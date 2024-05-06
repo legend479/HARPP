@@ -12,11 +12,10 @@ class Shape(Object):
      template of all the classes making shapes
     """
 
-    def __init__(self, start_point, end_point):
+    def __init__(self, start_point, end_point, pen_width=DEFAULT_PEN_SIZE):
         super().__init__(start_point, end_point)
         self.colour = DEFAULT_COLOR
-        self.pen_width = PEN_SIZE
-        self.id = None
+        self.pen_width = pen_width
 
     def move(self, delta):
         """
@@ -43,9 +42,8 @@ class Line(Shape):
         This is the line class it helps in making and storing the lines made.
     """
 
-    def __init__(self, start_point: tuple[int,int],
-                 end_point: tuple[int,int], color = DEFAULT_COLOR):
-        super().__init__(start_point, end_point)
+    def __init__(self, start_point: tuple[int,int], end_point: tuple[int,int], color = DEFAULT_COLOR, pen_width = DEFAULT_PEN_SIZE):
+        super().__init__(start_point, end_point, pen_width)
         diff = [start_point[0] - end_point[0], start_point[1] - end_point[1]]
         if diff[1] != 0:
             self.orientation = diff[0]/diff[1]
@@ -86,7 +84,7 @@ class Line(Shape):
         y_offset = 20
         start_point = [self.start_point[0] + x_offset, self.start_point[1] + y_offset]
         end_point = [self.end_point[0] + x_offset, self.end_point[1] + y_offset]
-        return Line(start_point, end_point)
+        return Line(start_point, end_point, self.colour, self.pen_width)
 
 class Rectangle(Shape):
     """
@@ -99,9 +97,8 @@ class Rectangle(Shape):
         corner_type (str): The type of corners of the rectangle. Default is 'Sharp'.
     """
 
-    def __init__(self, start_point: tuple[int, int],
-                 end_point: tuple[int, int], color=DEFAULT_COLOR, corner_type='Sharp'):
-        super().__init__(start_point, end_point)
+    def __init__(self, start_point: tuple[int, int], end_point: tuple[int, int], color=DEFAULT_COLOR, corner_type='Sharp',pen_width=DEFAULT_PEN_SIZE):
+        super().__init__(start_point, end_point, pen_width=pen_width)
         self.corner_type = corner_type
 
     def draw(self, window):
@@ -174,4 +171,4 @@ class Rectangle(Shape):
         y_offset = 20
         start_point = [self.start_point[0] + x_offset, self.start_point[1] + y_offset]
         end_point = [self.end_point[0] + x_offset, self.end_point[1] + y_offset]
-        return Rectangle(start_point, end_point)
+        return Rectangle(start_point, end_point, self.colour, self.corner_type)
