@@ -1,6 +1,5 @@
 from dependencies import *
 import PySimpleGUI as sg
-import random
 PEN_SIZE = 5
 PEN_COLOR = 'black'
 
@@ -15,15 +14,15 @@ def show_menu(cursor_pos):
 
     window = sg.Window("Menu", layout, location=cursor_pos,
                        no_titlebar=True, grab_anywhere=True)
-    
+
     option = None
     while True:
         event, values = window.read()
-        if event: 
+        if event:
             option = event
             break
     window.close()
-    return option           
+    return option
 
 
 def show_edit_popup(drawable):
@@ -33,7 +32,7 @@ def show_edit_popup(drawable):
         [sg.Text("Width"), sg.InputText(drawable.pen_width, key="-WIDTH-")],
 
         [sg.Text("Corner Type"), sg.DropDown(["Round", "Sharp"], default_value=drawable.corner_type,
-                                             key="-TYPE-")] if isinstance(drawable, Rectangle) else [],
+                                        key="-TYPE-")] if isinstance(drawable, Rectangle) else [],
 
         [sg.Button("Save", key="Save"), sg.Button("Cancel", key="-CANCEL-")]
     ]
@@ -127,14 +126,16 @@ def main():
                 click_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
                 for i, drawable in enumerate(drawables):
                     if drawable.detect_selection(click_pt):
-                        # if isinstance(drawable, (Line, Rectangle)) and hasattr(drawable, 'colour'):
+                        # if isinstance(drawable, (Line, Rectangle))
+                        # and hasattr(drawable, 'colour'):
                         #     c_map[drawable] = drawable.colour
                         # elif isinstance(drawable, Group):
                         #     update_colour_recursively(drawable.objects, c_map, DEFAULT_COLOR)
                         if i not in selected_indices:
                             selected_indices.add(i)
-                            if isinstance(drawable, (Line, Rectangle)) and hasattr(drawable, 'colour'):
-                                drawable.colour = "yellow"  # Update the color for individual objects
+                            if (isinstance(drawable, (Line, Rectangle))
+                                    and hasattr(drawable, 'colour')):
+                                drawable.colour = "yellow"
                             elif isinstance(drawable, Group):
                                 update_colour_recursively(drawable.objects, c_map, "yellow")
                             # color_mapping[i] = drawable.colour
@@ -206,7 +207,6 @@ def main():
             if event == '-COPY-':
                 if selected_group:
                     drawables.append(selected_group.get_duplicate())
-                        
 
             if event == '-CANVAS-':
                 if drawing_object:
@@ -270,7 +270,8 @@ def main():
                 exporter = Exporter(drawables)
                 exporter.save_to_file(save_path)
 
-        if event == "Open":
+        if event == "-OPEN-":
+            print("HIIII")
             open_path = sg.popup_get_file(
                 "Open Drawing", default_extension=".txt")
             if open_path:
@@ -291,9 +292,9 @@ def main():
                     # convert the cursor position to the window coordinates
                     cursor_pos = window.window["-CANVAS-"].Widget.canvasx(
                         cursor_pos[0]), window.window["-CANVAS-"].Widget.canvasy(cursor_pos[1])
-                    cursor_pos = window.window["-CANVAS-"].Widget.winfo_rootx(
-                    ) + cursor_pos[0], window.window["-CANVAS-"].Widget.winfo_rooty() + 600 - cursor_pos[1]
-                    
+                    cursor_pos = (window.window["-CANVAS-"].Widget.winfo_rootx(
+                    ) + cursor_pos[0], window.window["-CANVAS-"].Widget.winfo_rooty()
+                                  + 600 - cursor_pos[1])
                     option = show_menu(cursor_pos)
                     if option == "Edit":
                         show_edit_popup(drawable)
@@ -304,7 +305,6 @@ def main():
                         copy = drawable.get_duplicate()
                         drawables.append(copy)
                         update_canvas(window, drawables)
-                    
                     # show_edit_popup(drawable)
                     break
 

@@ -35,7 +35,7 @@ class Window:
             sg.Button("Group", size=(10, 1), enable_events=True, key="-GROUP-"),
             sg.Button("UnGroup", size=(10, 1), enable_events=True, key="-UNGROUP-"),
             sg.Push(),
-            sg.Button("Export to XML", size=(10, 1), enable_events=True, key="Export to XML"),
+            sg.Button("Export to XML", size=(12, 1), enable_events=True, key="Export to XML"),
         ]
 
         self.bottombar = [
