@@ -133,7 +133,7 @@ class Exporter:
         ET.SubElement(end_elem, 'y').text =\
             str(line.end_point[1])
         ET.SubElement(line_elem, 'color').text =\
-            line.colour
+            line.color
         return line_elem
 
     def _convert_rectangle_to_xml(self, rectangle: Rectangle) -> ET.Element:
@@ -155,7 +155,7 @@ class Exporter:
         ET.SubElement(lower_right_elem, 'y').text =\
             str(max(rectangle.start_point[1], rectangle.end_point[1]))
         ET.SubElement(rect_elem, 'color').text =\
-            rectangle.colour
+            rectangle.color
         ET.SubElement(rect_elem, 'corner').text =\
             'Round' if rectangle.corner_type == 'Round' else 'Sharp'
         return rect_elem
@@ -211,7 +211,7 @@ class Exporter:
         """
         Converts a Line object to a string.
         """
-        return f"line {line.start_point[0]} {line.start_point[1]} {line.end_point[0]} {line.end_point[1]} {line.colour}"
+        return f"line {line.start_point[0]} {line.start_point[1]} {line.end_point[0]} {line.end_point[1]} {line.color}"
 
     def _convert_rectangle_to_string(self, rectangle: Rectangle) -> str:
         """
@@ -219,7 +219,7 @@ class Exporter:
         """
         corner_style = "r"\
             if rectangle.corner_type == "Round" else "Sharp"
-        return f"rect {rectangle.start_point[0]} {rectangle.start_point[1]} {rectangle.end_point[0]} {rectangle.end_point[1]} {rectangle.colour} {corner_style}"
+        return f"rect {rectangle.start_point[0]} {rectangle.start_point[1]} {rectangle.end_point[0]} {rectangle.end_point[1]} {rectangle.color} {corner_style}"
 
     def _convert_from_string(self, line: str) -> Union[None, object]:
         """

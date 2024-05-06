@@ -11,7 +11,7 @@ def test_line_init():
     line = Line(start_point, end_point)
     assert line.start_point == start_point
     assert line.end_point == end_point
-    assert line.colour == DEFAULT_COLOR
+    assert line.color == DEFAULT_COLOR
     assert line.pen_width == DEFAULT_PEN_SIZE
     assert line.orientation == 1.0
 
@@ -54,7 +54,7 @@ def test_rectangle_init():
     rect = Rectangle(start_point, end_point)
     assert rect.start_point == start_point
     assert rect.end_point == end_point
-    assert rect.colour == DEFAULT_COLOR
+    assert rect.color == DEFAULT_COLOR
     assert rect.pen_width == DEFAULT_PEN_SIZE
     assert rect.corner_type == 'Sharp'
 

@@ -3,7 +3,7 @@ This module houses all shapes relevant to drawing
 """
 import math
 from object import Object
-from constants import DEFAULT_COLOR, DEFAULT_PEN_SIZE, INF, ROUND_RADIUS, EPSILON
+from constants import DEFAULT_COLOR, DEFAULT_PEN_SIZE, ROUND_RADIUS, EPSILON
 from typing import Optional, Union
 import PySimpleGUI as sg
 
@@ -16,8 +16,9 @@ class Shape(Object):
 
     def __init__(self, start_point: list[int], end_point: list[int], pen_width: Optional[int] = DEFAULT_PEN_SIZE) -> None:
         super().__init__(start_point, end_point)
-        self.colour = DEFAULT_COLOR
+        self.color = DEFAULT_COLOR
         self.pen_width = pen_width
+        self.selected = False
 
     def move(self, delta: list[int]) -> None:
         """
@@ -44,8 +45,9 @@ class Line(Shape):
         This is the line class it helps in making and storing the lines made.
     """
 
-    def __init__(self, start_point: tuple[int,int], end_point: tuple[int,int], color: Optional[tuple[int, int, int]] = DEFAULT_COLOR, pen_width: Optional[int] = DEFAULT_PEN_SIZE):
+    def __init__(self, start_point: tuple[int,int], end_point: tuple[int,int], color: str = DEFAULT_COLOR, pen_width: Optional[int] = DEFAULT_PEN_SIZE):
         super().__init__(start_point, end_point, pen_width)
+        self.color = color
         diff = [start_point[0] - end_point[0], start_point[1] - end_point[1]]
         if diff[1] != 0:
             self.orientation = diff[0]/diff[1]
@@ -56,8 +58,9 @@ class Line(Shape):
         """
             It draws the shape
         """
+        color = "yellow" if self.selected else self.color
         self.id = window.canvas.draw_line(
-            self.start_point, self.end_point, color=self.colour, width=self.pen_width)
+            self.start_point, self.end_point, color=color, width=self.pen_width)
 
     def detect_selection(self, point: tuple[int, int]) -> Union[None, object]:
         """
@@ -86,7 +89,7 @@ class Line(Shape):
         y_offset = 20
         start_point = [self.start_point[0] + x_offset, self.start_point[1] + y_offset]
         end_point = [self.end_point[0] + x_offset, self.end_point[1] + y_offset]
-        return Line(start_point, end_point, self.colour, self.pen_width)
+        return Line(start_point, end_point, self.color, self.pen_width)
 
 class Rectangle(Shape):
     """
@@ -99,9 +102,10 @@ class Rectangle(Shape):
         corner_type (str): The type of corners of the rectangle. Default is 'Sharp'.
     """
 
-    def __init__(self, start_point: tuple[int, int], end_point: tuple[int, int], color: Optional[tuple[int, int, int]] = DEFAULT_COLOR, corner_type: Optional[str] = 'Sharp',pen_width: Optional[int] = DEFAULT_PEN_SIZE) -> None:
+    def __init__(self, start_point: tuple[int, int], end_point: tuple[int, int], color: str = DEFAULT_COLOR, corner_type: Optional[str] = 'Sharp',pen_width: Optional[int] = DEFAULT_PEN_SIZE) -> None:
         super().__init__(start_point, end_point, pen_width=pen_width)
         self.corner_type = corner_type
+        self.color = color
 
     def draw(self, window: sg.Window) -> None:
         """
@@ -121,25 +125,26 @@ class Rectangle(Shape):
         for i in range(segments):
             angle = math.pi / 2 * (segments - i) / segments
             points.append((x1 + radius - radius * math.sin(angle),
-                           y1 + radius + radius * math.cos(angle)))
+                           y1 - radius + radius * math.cos(angle)))
 
         for i in range(segments):
             angle = math.pi / 2 * i / segments
             points.append((x2 - radius + radius * math.sin(angle),
-                           y1 + radius + radius * math.cos(angle)))
+                           y1 - radius + radius * math.cos(angle)))
 
         for i in range(segments):
             angle = math.pi / 2 * (segments - i) / segments
             points.append((x2 - radius + radius * math.sin(angle),
-                           y2 - radius - radius * math.cos(angle)))
+                           y2 + radius - radius * math.cos(angle)))
 
         for i in range(segments):
             angle = math.pi / 2 * i / segments
             points.append((x1 + radius - radius * math.sin(angle),
-                           y2 - radius - radius * math.cos(angle)))
+                           y2 + radius - radius * math.cos(angle)))
 
+        color = "yellow" if self.selected else self.color
         window.canvas.draw_polygon(
-            points, fill_color="", line_color=self.colour, line_width=self.pen_width)
+            points, fill_color="", line_color=color, line_width=self.pen_width)
 
     def detect_selection(self, point: tuple[int, int]) -> Union[None, object]:
         """
@@ -173,4 +178,4 @@ class Rectangle(Shape):
         y_offset = 20
         start_point = [self.start_point[0] + x_offset, self.start_point[1] + y_offset]
         end_point = [self.end_point[0] + x_offset, self.end_point[1] + y_offset]
-        return Rectangle(start_point, end_point, self.colour, self.corner_type, self.pen_width)
+        return Rectangle(start_point, end_point, self.color, self.corner_type, self.pen_width)

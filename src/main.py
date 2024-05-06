@@ -30,7 +30,7 @@ def show_menu(cursor_pos: tuple[int, int]) -> Union[None, any]:
 def show_edit_popup(drawable: object) -> None:
     layout = [
         [sg.Text("Edit Object")],
-        [sg.Text("Color"), sg.InputText(drawable.colour, key="-COLOR-")],
+        [sg.Text("Color"), sg.InputText(drawable.color, key="-COLOR-")],
         [sg.Text("Width"), sg.InputText(drawable.pen_width, key="-WIDTH-")],
 
         [sg.Text("Corner Type"), sg.DropDown(["Round", "Sharp"], default_value=drawable.corner_type,
@@ -46,7 +46,7 @@ def show_edit_popup(drawable: object) -> None:
         if event == sg.WIN_CLOSED:
             break
         if event == "Save":
-            drawable.colour = values["-COLOR-"]
+            drawable.color = values["-COLOR-"]
             drawable.pen_width = values["-WIDTH-"]
             if isinstance(drawable, Rectangle):
                 drawable.corner_type = values["-TYPE-"]
@@ -63,12 +63,21 @@ def update_canvas(window: sg.Window, drawables: list[object]) -> None:
         drawable.draw(window)
 
 
+def propagate_selection(obj: Object, selected: bool) -> None:
+        """
+            It propagates the selection to the children
+        """
+        if (isinstance(obj, Shape)):
+            obj.selected = selected
+        elif isinstance(obj, Group):
+            for c_obj in obj.objects:
+                propagate_selection(c_obj, selected)
+
 def main():
     window = win.Window(theme="Reddit")
     drawables = []  # Collection of all groups and individual objects.
     # drawing_line = False
     # drawing_rect = False
-    c_map = {}
     selected_objects = []  # Stores the current objects
     window.canvas.bind("<Motion>", '-Motion-')
     window.canvas.bind("<Button-3>", '-RightClick-')
@@ -84,12 +93,6 @@ def main():
     unsaved_changes = False
     pen_width = DEFAULT_PEN_SIZE
 
-    def update_colour_recursively(objects, c_map, color):
-        for obj in objects:
-            if isinstance(obj, Shape):
-                obj.colour = c_map.get(obj, color)
-            elif isinstance(obj, Group):
-                update_colour_recursively(obj.objects, c_map, color)
     try:
         while True:
             event, values = window.event()
@@ -110,28 +113,22 @@ def main():
 
             if event == "-GROUP-":
                 group_mode = not group_mode
+                ungroup_mode = False
                 if not group_mode:
-                    new_friends = []
+                    new_grp = []
                     if len(selected_indices) > 0:
-                        for friend in selected_indices:
-                            obj = drawables[friend]
-                            if isinstance(obj, Shape):
-                                obj.colour = c_map.get(obj, DEFAULT_COLOR)
-                            elif isinstance(obj, Group):
-                                update_colour_recursively(
-                                    obj.objects, c_map, DEFAULT_COLOR)
-                            new_friends.append(drawables[friend])
+                        for indx in selected_indices:
+                            obj = drawables[indx]
+                            propagate_selection(obj,False)
+                            new_grp.append(drawables[indx])
 
-                        drawables.append(Group(new_friends))
-                        li = list(selected_indices)
-                        li = sorted(li)
-                        li = reversed(li)
+                        drawables.append(Group(new_grp))
+                        li = sorted(list(selected_indices), reverse=True)
 
-                        for friend in li:
-                            drawables.pop(friend)
+                        for indx in li:
+                            drawables.pop(indx)
 
                         selected_indices = set()
-                        c_map = {}
                         update_canvas(window, drawables)
                         unsaved_changes = True
 
@@ -146,20 +143,11 @@ def main():
 
                             if i not in selected_indices:
                                 selected_indices.add(i)
-                                if (isinstance(drawable, Shape)):
-                                    drawable.colour = "yellow"
-                                elif isinstance(drawable, Group):
-                                    update_colour_recursively(
-                                        drawable.objects, c_map, "yellow")
+                                propagate_selection(drawable,True)
 
                             else:
                                 selected_indices.remove(i)
-                                obj = drawable
-                                if isinstance(obj, Shape):
-                                    obj.colour = c_map.get(obj, DEFAULT_COLOR)
-                                elif isinstance(obj, Group):
-                                    update_colour_recursively(
-                                        obj.objects, c_map, DEFAULT_COLOR)
+                                propagate_selection(drawable,False)
 
                             update_canvas(window, drawables)
                             unsaved_changes = True
