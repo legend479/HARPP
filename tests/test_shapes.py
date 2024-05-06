@@ -1,11 +1,10 @@
-import pytest
-# import pytest
 import os
 import sys
-sys.path.append(os.path.abspath('../src'))
-print(os.path.dirname(os.path.dirname(__file__))+'/src/', sys.path)
 from shapes import Line, Rectangle
 from constants import DEFAULT_COLOR, DEFAULT_PEN_SIZE
+
+sys.path.append(os.path.abspath('../src'))
+
 def test_line_init():
     start_point = (0, 0)
     end_point = (10, 10)

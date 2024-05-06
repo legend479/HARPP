@@ -92,8 +92,6 @@ def main():
     try:
         while True:
             event, values = window.event()
-            print(event, values, group_mode, selected_objects)
-
             if event == sg.WIN_CLOSE_ATTEMPTED_EVENT:
                 if unsaved_changes:
                     confirm = sg.popup_yes_no(
@@ -129,7 +127,6 @@ def main():
                         li = reversed(li)
 
                         for friend in li:
-                            print(friend, drawables)
                             drawables.pop(friend)
 
                         selected_indices = set()
@@ -299,10 +296,7 @@ def main():
                     
                 open_path = sg.popup_get_file(
                     "Open Drawing", default_extension=".txt")
-                if open_path:
-                    print(open_path)
-                    
-
+                if open_path:                   
                     exporter = Exporter([])
                     try: 
                         drawables = exporter.load_from_file(open_path)

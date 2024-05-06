@@ -34,7 +34,7 @@ class Exporter:
                 file.write(xml_pretty_str)
             return True  # Export successful
         except Exception as e:
-            print(f"Error exporting to XML: {e}")
+            
             return False
 
     def import_from_xml(self, file_path: str):
@@ -235,7 +235,6 @@ class Exporter:
                 list(map(float, parts[1:5])) + [parts[5], parts[6]]
             return Rectangle((start_x, start_y),
                              (end_x, end_y), color, corner_style)
-        print("FUCK BRO")
         return None
 
     def _export_group_to_file(self, file, group: Group):
