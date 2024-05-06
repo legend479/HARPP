@@ -4,14 +4,41 @@ import PySimpleGUI as sg
 PEN_SIZE = 5
 PEN_COLOR = 'black'
 
+
+def show_menu(cursor_pos, window):
+    layout = [
+        [sg.Button("Edit",button_color=("white", "blue"))],
+        [sg.Button("Delete",button_color=("white", "red"))],
+        [sg.Button("Copy&Paste",button_color=("white", "green"))],
+        [sg.Button("Cancel",button_color=("white", "gray"))]
+    ]
+
+    window = sg.Window("Menu", layout, location=cursor_pos,
+                       no_titlebar=True, grab_anywhere=True)
+    while True:
+        event, values = window.read()
+        if event == sg.WIN_CLOSED:
+            break
+        if event == "Edit":
+            break
+        if event == "Delete":
+            break
+        if event == "Copy&Paste":
+            break
+        if event == "Cancel":
+            break
+    window.close()
+
+
 def show_edit_popup(drawable):
     layout = [
         [sg.Text("Edit Object")],
         [sg.Text("Color"), sg.InputText(drawable.colour, key="-COLOR-")],
         [sg.Text("Width"), sg.InputText(drawable.pen_width, key="-WIDTH-")],
-        
-        [sg.Text("Corner Type"), sg.DropDown(["Round","Sharp"],default_value=drawable.corner_type, key="-TYPE-")] if isinstance(drawable, Rectangle) else [],
-            
+
+        [sg.Text("Corner Type"), sg.DropDown(["Round", "Sharp"], default_value=drawable.corner_type,
+                                             key="-TYPE-")] if isinstance(drawable, Rectangle) else [],
+
         [sg.Button("Save", key="-SAVE-"), sg.Button("Cancel", key="-CANCEL-")]
     ]
 
@@ -21,29 +48,31 @@ def show_edit_popup(drawable):
         event, values = window.read()
         if event == sg.WIN_CLOSED:
             break
-        if event == "-SAVE-":            
+        if event == "-SAVE-":
             drawable.colour = values["-COLOR-"]
             drawable.pen_width = values["-WIDTH-"]
             if isinstance(drawable, Rectangle):
-                drawable.corner_type = values["-TYPE-"]           
+                drawable.corner_type = values["-TYPE-"]
             break
         if event == "-CANCEL-":
             break
 
     window.close()
 
+
 def main():
     window = win.Window()
-    drawables = [] # Collection of all groups and individual objects.
+    drawables = []  # Collection of all groups and individual objects.
     # drawing_line = False
     # drawing_rect = False
-    selected_objects = [] # Stores the current objects
+    selected_objects = []  # Stores the current objects
     window.canvas.bind("<Motion>", '-Motion-')
     window.canvas.bind("<Button-3>", '-RightClick-')
     group_mode = False
     ungroup_mode = False
     selected_indices = set()
-    drawing_object = 0 # 0 refers to not drawing. 1 refers to line and 2 refers to rectangle
+    color_mapping = {}
+    drawing_object = 0  # 0 refers to not drawing. 1 refers to line and 2 refers to rectangle
     start_pt = None
     groups = []
     end_pt = None
@@ -51,10 +80,6 @@ def main():
     selected_object = None
 
     while True:
-        # for drawable in drawables:
-        #     drawable.draw(window)
-        #     print("YES")
-
         event, values = window.event()
         print(event, values, group_mode, selected_objects)
         if event == sg.WIN_CLOSED:
@@ -65,25 +90,29 @@ def main():
                 new_friends = []
                 if len(selected_indices) > 0:
                     for friend in selected_indices:
+                        drawables[friend].colour = color_mapping[friend]
                         new_friends.append(drawables[friend])
 
                     drawables.append(Group(new_friends))
                     li = list(selected_indices)
                     li = sorted(li)
                     li = reversed(li)
-                    # selected_indices = set(reversed(sorted(list(selected_indices))))
+
                     for friend in li:
                         print(friend, drawables)
                         drawables.pop(friend)
+
                     selected_indices = set()
+                    color_mapping = {}
                     window.canvas.erase()
+
                     for drawable in drawables:
                         drawable.draw(window)
 
-                window.window["-GROUP-"].update(text = "Group")
+                window.window["-GROUP-"].update(text="Group")
 
         if group_mode:
-            window.window["-GROUP-"].update(text = "Done")
+            window.window["-GROUP-"].update(text="Done")
             if event == "-CANVAS-":
                 click_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
                 for i, drawable in enumerate(drawables):
@@ -91,16 +120,12 @@ def main():
                     if drawable.detect_selection(click_pt):
                         if i not in selected_indices:
                             selected_indices.add(i)
+                            color_mapping[i] = drawable.colour
+                            drawable.colour = "yellow"
                         else:
                             selected_indices.remove(i)
+                            del color_mapping[i]
 
-            # else:
-            #     selected_group.move(click_pt)
-            #     selected_group = None
-            #     window.canvas.erase()
-            #     for drawable in drawables:
-            #         drawable.draw(window)
-        
         elif ungroup_mode:
             if event == "-CANVAS-":
                 click_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
@@ -115,15 +140,16 @@ def main():
                     window.canvas.erase()
                     for drawable in drawables:
                         drawable.draw(window)
-                    selected_group=None
-                    selected_object= None
+                    selected_group = None
+                    selected_object = None
                     ungroup_mode = False
 
         else:
             if event == "-LINE-":
                 # drawing_line = True
                 # drawing_rect = False
-                drawing_object = 1 if drawing_object != 1 else 0 # So that clicking the line button twice will exit the draw line state
+                # So that clicking the line button twice will exit the draw line state
+                drawing_object = 1 if drawing_object != 1 else 0
                 start_pt = None
                 end_pt = None
 
@@ -135,7 +161,8 @@ def main():
                 end_pt = None
             if event == '-EXPORT-':
                 exporter = Exporter(drawables)
-                file_path = sg.popup_get_file('Save As', save_as=True, file_types=(("XML Files", "*.xml"),))
+                file_path = sg.popup_get_file(
+                    'Save As', save_as=True, file_types=(("XML Files", "*.xml"),))
                 if file_path:
                     exporter.export_to_xml(file_path+'.xml')
 
@@ -149,7 +176,8 @@ def main():
             if event == '-CANVAS-':
                 if drawing_object:
                     if start_pt is None:
-                        start_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
+                        start_pt = [values["-CANVAS-"]
+                                    [0], values["-CANVAS-"][1]]
                     else:
                         end_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
                         # window.canvas.draw_line(start_pt, end_pt, color=PEN_COLOR, width=PEN_SIZE)
@@ -165,13 +193,15 @@ def main():
                     click_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
                     if not selected_object:
                         for drawable in drawables:
-                            selected_object = drawable.detect_selection(click_pt)
+                            selected_object = drawable.detect_selection(
+                                click_pt)
                             if selected_object:
                                 selected_group = drawable
                                 break
 
                     else:
-                        delta = [values["-CANVAS-"][0] - selected_group.centroid[0], values["-CANVAS-"][1] - selected_group.centroid[1]]
+                        delta = [values["-CANVAS-"][0] - selected_group.centroid[0],
+                                 values["-CANVAS-"][1] - selected_group.centroid[1]]
 
                         selected_group.move(delta)
                         selected_group = None
@@ -179,35 +209,17 @@ def main():
                         window.canvas.erase()
                         for drawable in drawables:
                             drawable.draw(window)
-        
-        if selected_group :
-            delta = [values["-CANVAS-"][0] - selected_group.centroid[0], values["-CANVAS-"][1] - selected_group.centroid[1]]
+
+        if selected_group:
+            delta = [values["-CANVAS-"][0] - selected_group.centroid[0],
+                     values["-CANVAS-"][1] - selected_group.centroid[1]]
 
             selected_group.move(delta)
             window.canvas.erase()
             for drawable in drawables:
                 drawable.draw(window)
-            
-            
 
         if event == "-UNGROUP-":
-            # new_drawables = []
-            # for drawable in drawables:
-            #     if isinstance(drawable, Group):
-            #         new_drawables.extend(drawable.objects)
-            #     else:
-            #         new_drawables.append(drawable)
-            # drawables = new_drawables
-
-
-            # ind = drawables.index(selected_group)
-            # drawables += drawables[ind].objects
-            # drawables.pop(ind)
-            # window.canvas.erase()
-            # for drawable in drawables:
-            #     drawable.draw(window)
-            # selected_group=None
-            # selected_object= None
             ungroup_mode = True
 
         if event == '-CANVAS--Motion-' and start_pt:
@@ -217,21 +229,26 @@ def main():
             cursor_pos = values["-CANVAS-"]
             match drawing_object:
                 case 1:
-                    window.canvas.draw_line(start_pt, cursor_pos, color=PEN_COLOR, width=PEN_SIZE)
+                    window.canvas.draw_line(
+                        start_pt, cursor_pos, color=PEN_COLOR, width=PEN_SIZE)
                 case 2:
-                    window.canvas.draw_rectangle(start_pt, cursor_pos, line_color=PEN_COLOR, line_width=PEN_SIZE)
+                    window.canvas.draw_rectangle(
+                        start_pt, cursor_pos, line_color=PEN_COLOR, line_width=PEN_SIZE)
         if event == "-SAVE-":
-            save_path = sg.popup_get_file("Save Drawing", save_as=True, default_extension=".txt")
+            save_path = sg.popup_get_file(
+                "Save Drawing", save_as=True, default_extension=".txt")
             if save_path:
                 exporter = Exporter(drawables)
                 exporter.save_to_file(save_path)
 
         if event == "-OPEN-":
-            open_path = sg.popup_get_file("Open Drawing", default_extension=".txt")
+            open_path = sg.popup_get_file(
+                "Open Drawing", default_extension=".txt")
             if open_path:
                 print(open_path)
                 if len(drawables) > 0:
-                    confirm = sg.popup_yes_no("You have unsaved changes. Do you want to continue?")
+                    confirm = sg.popup_yes_no(
+                        "You have unsaved changes. Do you want to continue?")
                     if confirm == "No":
                         continue
                 exporter = Exporter([])
@@ -240,18 +257,24 @@ def main():
                 print(drawables)
                 for drawable in drawables:
                     drawable.draw(window)
-        if event=="-CANVAS--RightClick-":
+        if event == "-CANVAS--RightClick-":
             click_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
             for drawable in drawables:
                 if drawable.detect_selection(click_pt):
-                    show_edit_popup(drawable)
+                    cursor_pos = values["-CANVAS-"]
+                    # convert the cursor position to the window coordinates
+                    cursor_pos = window.window["-CANVAS-"].Widget.canvasx(
+                        cursor_pos[0]), window.window["-CANVAS-"].Widget.canvasy(cursor_pos[1])
+                    cursor_pos = window.window["-CANVAS-"].Widget.winfo_rootx(
+                    ) + cursor_pos[0], window.window["-CANVAS-"].Widget.winfo_rooty() + cursor_pos[1]
+                    show_menu(cursor_pos, window)
+                    # show_edit_popup(drawable)
                     break
-                       
-            
-        
+
         if event == '-CLEAR-':
             drawables = []
             window.canvas.erase()
+
 
 if __name__ == "__main__":
     main()

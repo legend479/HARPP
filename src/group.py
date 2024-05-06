@@ -28,6 +28,7 @@ class Group(Object):
 
     def draw(self, window):
         for obj in self.objects:
+            print(obj.colour)
             obj.draw(window)
 
     def move(self, delta: tuple[int, int]):
