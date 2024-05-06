@@ -3,6 +3,7 @@ from shapes import Shape
 from object import Object
 import random
 from typing import List, Optional
+from constants import *
 
 class Group(Object):
     """
@@ -80,7 +81,7 @@ class Group(Object):
         Updates the endpoints of the objects in the group randomly.
         """
         for obj in self.objects:
-            obj.move((random.choice([-10, 10]), random.choice([-10, 10])))
+            obj.move((random.choice(RANDOM_CHOICES), random.choice(RANDOM_CHOICES)))
 
     # def _update_endpoints_recursive(self, obj, up_bound, low_bound):
     #     """
