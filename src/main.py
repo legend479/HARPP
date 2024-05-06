@@ -140,7 +140,7 @@ def main():
                 window.window["-GROUP-"].update(text="Done")
                 if event == "-CANVAS-":
                     click_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
-                    for i, drawable in enumerate(drawables):
+                    for i, drawable in enumerate(drawables[::-1]):
                         if drawable.detect_selection(click_pt):
 
                             if i not in selected_indices:
@@ -168,7 +168,7 @@ def main():
             elif ungroup_mode:
                 if event == "-CANVAS-":
                     click_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
-                    for drawable in drawables:
+                    for drawable in drawables[::-1]:
                         if drawable.detect_selection(click_pt):
                             selected_group = drawable
                             break
@@ -240,7 +240,7 @@ def main():
                     else:
                         click_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
                         if not selected_group:
-                            for drawable in drawables:
+                            for drawable in drawables[::-1]:
                                 selected_object = drawable.detect_selection(
                                     click_pt)
                                 if selected_object:
@@ -308,15 +308,14 @@ def main():
 
             if event == "-CANVAS--RightClick-":
                 click_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
-                for i, drawable in enumerate(drawables):
+                for i, drawable in enumerate(drawables[::-1]):
                     if (selected_object:=drawable.detect_selection(click_pt)):
                         cursor_pos = values["-CANVAS-"]
-                        # convert the cursor position to the window coordinates
                         cursor_pos = window.window["-CANVAS-"].Widget.canvasx(
                             cursor_pos[0]), window.window["-CANVAS-"].Widget.canvasy(cursor_pos[1])
                         cursor_pos = (window.window["-CANVAS-"].Widget.winfo_rootx(
                         ) + cursor_pos[0], window.window["-CANVAS-"].Widget.winfo_rooty()
-                            + 600 - cursor_pos[1])
+                            + CANVAS_SIZE[1] - cursor_pos[1])
                         option = show_menu(cursor_pos)
                         unsaved_changes = True
 

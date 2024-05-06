@@ -26,7 +26,7 @@ class Exporter:
         root = ET.Element('drawing')
         for drawable in self.drawables:
             root.append(self._convert_to_xml(drawable))
-        # tree = ET.ElementTree(root)
+        
         xml_str = ET.tostring(root, encoding='utf-8')
         xml_pretty_str = minidom.parseString(xml_str).toprettyxml(indent="  ")
         try:
