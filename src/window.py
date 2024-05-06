@@ -10,8 +10,9 @@ class Window:
         play, events, and closing.
     """
 
-    def __init__(self, title="HARPP Editor"):
+    def __init__(self):
 
+        self.theme = sg.theme("DarkBlue")
         self.canvas = sg.Graph(
             canvas_size=(800, 600),
             graph_bottom_left=(0, 0),
@@ -20,34 +21,44 @@ class Window:
             enable_events=True,
             key="-CANVAS-",
         )
+        
+        self.menubar = [
+            ["File", ["Open", "Save", "Export",[ "Export to XML"]]],
+        ]
 
-        self.topbar = [
-            sg.Button("Line", size=(10, 1), enable_events=True, key="-LINE-"),
-            sg.Button("Rect", size=(10, 1), enable_events=True, key="-RECT-"),
-
-            sg.Button("Export", size=(10, 1), enable_events=True, key="-EXPORT-"),
+        self.topbar = [    
+            sg.Text("Shapes:"),
+            sg.Button("Line", enable_events=True, key="-LINE-", auto_size_button=True),
+            sg.Button("Rectangle", enable_events=True, key="-RECT-",auto_size_button=True),
+            sg.Sizer(50, 1),
+            sg.Text("Operations:"),
             sg.Button("Group", size=(10, 1), enable_events=True, key="-GROUP-"),
             sg.Button("UnGroup", size=(10, 1), enable_events=True, key="-UNGROUP-"),
-            sg.Button("Save", size=(10, 1), enable_events=True, key="-SAVE-"),
-            sg.Button("Open", size=(10, 1), enable_events=True, key="-OPEN-"),
-
-
-
+            sg.Push(),
+            sg.Button("Export to XML", size=(10, 1), enable_events=True, key="Export to XML"),
         ]
 
         self.bottombar = [
-            sg.Button("Save", size=(10, 1)),
             sg.Button("Clear", size=(10, 1),key="-CLEAR-",enable_events=True),
+            sg.Push(),
+            sg.Button("Save", size=(10, 1)),
+            sg.Button("Open", size=(10, 1), enable_events=True, key="-OPEN-"),
+
         ]
 
         self.layout = [
+            [sg.Menu(self.menubar,)],
             self.topbar,
             [self.canvas],
             self.bottombar,
         ]
 
         self.window = sg.Window(
-            "HARPP Editor", layout=self.layout, margins=(0, 0), finalize=True,)
+            "HARPP Editor", layout=self.layout, margins=(0, 0), finalize=True)
+        
+        
+        # attach menu bar
+         
 
     def display(self):
         while True:

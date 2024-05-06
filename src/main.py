@@ -35,7 +35,7 @@ def show_edit_popup(drawable):
         [sg.Text("Corner Type"), sg.DropDown(["Round", "Sharp"], default_value=drawable.corner_type,
                                              key="-TYPE-")] if isinstance(drawable, Rectangle) else [],
 
-        [sg.Button("Save", key="-SAVE-"), sg.Button("Cancel", key="-CANCEL-")]
+        [sg.Button("Save", key="Save"), sg.Button("Cancel", key="-CANCEL-")]
     ]
 
     window = sg.Window("Edit Object", layout)
@@ -44,7 +44,7 @@ def show_edit_popup(drawable):
         event, values = window.read()
         if event == sg.WIN_CLOSED:
             break
-        if event == "-SAVE-":
+        if event == "Save":
             drawable.colour = values["-COLOR-"]
             drawable.pen_width = values["-WIDTH-"]
             if isinstance(drawable, Rectangle):
@@ -189,7 +189,7 @@ def main():
                 drawing_object = 2 if drawing_object != 2 else 0
                 start_pt = None
                 end_pt = None
-            if event == '-EXPORT-':
+            if event == 'Export to XML':
                 exporter = Exporter(drawables)
                 file_path = sg.popup_get_file(
                     'Save As', save_as=True, file_types=(("XML Files", "*.xml"),))
@@ -263,14 +263,14 @@ def main():
                 case 2:
                     window.canvas.draw_rectangle(
                         start_pt, cursor_pos, line_color=PEN_COLOR, line_width=PEN_SIZE)
-        if event == "-SAVE-":
+        if event == "Save":
             save_path = sg.popup_get_file(
                 "Save Drawing", save_as=True, default_extension=".txt")
             if save_path:
                 exporter = Exporter(drawables)
                 exporter.save_to_file(save_path)
 
-        if event == "-OPEN-":
+        if event == "Open":
             open_path = sg.popup_get_file(
                 "Open Drawing", default_extension=".txt")
             if open_path:
@@ -292,7 +292,7 @@ def main():
                     cursor_pos = window.window["-CANVAS-"].Widget.canvasx(
                         cursor_pos[0]), window.window["-CANVAS-"].Widget.canvasy(cursor_pos[1])
                     cursor_pos = window.window["-CANVAS-"].Widget.winfo_rootx(
-                    ) + cursor_pos[0], window.window["-CANVAS-"].Widget.winfo_rooty() + cursor_pos[1]
+                    ) + cursor_pos[0], window.window["-CANVAS-"].Widget.winfo_rooty() + 600 - cursor_pos[1]
                     
                     option = show_menu(cursor_pos)
                     if option == "Edit":
