@@ -56,7 +56,7 @@ class Window:
         ]
 
         self.window = sg.Window(
-            "HARPP Editor", layout=self.layout, margins=(0, 0), finalize=True
+            "HARPP Editor", layout=self.layout, margins=(0, 0), finalize=True, enable_close_attempted_event=True
         )
 
     def display(self):
