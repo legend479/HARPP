@@ -80,23 +80,23 @@ class Group(Object):
         Updates the endpoints of the objects in the group randomly.
         """
         for obj in self.objects:
-            self._update_endpoints_recursive(obj, -10, 10)
+            obj.move((random.choice([-10, 10]), random.choice([-10, 10])))
 
-    def _update_endpoints_recursive(self, obj, up_bound, low_bound):
-        """
-        Recursively updates the endpoints of the objects in the group.
+    # def _update_endpoints_recursive(self, obj, up_bound, low_bound):
+    #     """
+    #     Recursively updates the endpoints of the objects in the group.
 
-        Args:
-            obj: The object to update the endpoints for.
-            up_bound: The upper bound for the random update.
-            low_bound: The lower bound for the random update.
-        """
-        if isinstance(obj, Shape):
-            kk = random.randint(up_bound, low_bound)
-            new_end_point = (obj.end_point[0] + kk, obj.end_point[1] + kk)
-            obj.end_point = new_end_point
-            new_start_point = (obj.start_point[0] + kk, obj.start_point[1] + kk)
-            obj.start_point = new_start_point
-        elif isinstance(obj, Group):
-            for sub_obj in obj.objects:
-                self._update_endpoints_recursive(sub_obj, up_bound, low_bound)
+    #     Args:
+    #         obj: The object to update the endpoints for.
+    #         up_bound: The upper bound for the random update.
+    #         low_bound: The lower bound for the random update.
+    #     """
+    #     if isinstance(obj, Shape):
+    #         kk = random.randint(up_bound, low_bound)
+    #         new_end_point = (obj.end_point[0] + kk, obj.end_point[1] + kk)
+    #         obj.end_point = new_end_point
+    #         new_start_point = (obj.start_point[0] + kk, obj.start_point[1] + kk)
+    #         obj.start_point = new_start_point
+    #     elif isinstance(obj, Group):
+    #         for sub_obj in obj.objects:
+    #             self._update_endpoints_recursive(sub_obj, up_bound, low_bound)
