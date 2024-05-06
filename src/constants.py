@@ -1,3 +1,6 @@
+"""
+All constants used throughout the code
+"""
 PEN_SIZE = 5
 PEN_COLOR = 'black'
 EPSILON = 20

@@ -2,7 +2,6 @@
 Exporter module for exporting and importing drawing data to/from
  XML and ASCII text files.
 """
-
 import xml.etree.ElementTree as ET
 import sys
 import os
