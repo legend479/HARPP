@@ -3,6 +3,7 @@ Exporter module for exporting and importing drawing data to/from
  XML and ASCII text files.
 """
 import xml.etree.ElementTree as ET
+from typing import Union
 import sys
 import os
 from xml.dom import minidom
@@ -14,10 +15,10 @@ class Exporter:
     Exporter class to export the data to an xml file
     and ASCII text file
     """
-    def __init__(self, drawables: list[object]):
+    def __init__(self, drawables: list[object]) -> None:
         self.drawables = drawables
 
-    def export_to_xml(self, file_path: str):
+    def export_to_xml(self, file_path: str) -> bool:
         """
         Exports the drawables to an XML file
         :param file_path:The file path to save the XML file
@@ -37,7 +38,7 @@ class Exporter:
             
             return False
 
-    def import_from_xml(self, file_path: str):
+    def import_from_xml(self, file_path: str) -> list[object]:
         """
         Imports drawables from an XML file.
         :param file_path:The file path to the XML file.
@@ -52,7 +53,7 @@ class Exporter:
                 drawables.append(drawable)
         return drawables
 
-    def export_to_file(self, file_path: str):
+    def export_to_file(self, file_path: str) -> None:
         """
         Exports the drawables to an ASCII text file.
 
@@ -71,7 +72,7 @@ class Exporter:
                     self._export_group_to_file(file, drawable)
                     file.write("end\n")
 
-    def import_from_file(self, file_path: str):
+    def import_from_file(self, file_path: str) -> list[object]:
         """
         Imports drawables from an ASCII text file
         :param file_path: The file path to the ASCII text file
@@ -90,7 +91,7 @@ class Exporter:
                         drawables.append(obj)
         return drawables
 
-    def _convert_to_xml(self, drawable: object):
+    def _convert_to_xml(self, drawable: object) -> ET.Element:
         """
         Converts a drawable object to XML format.
         :param drawable: The drawable object to convert
@@ -103,7 +104,7 @@ class Exporter:
         elif isinstance(drawable, Group):
             return self._convert_group_to_xml(drawable)
 
-    def _convert_from_xml(self, elem):
+    def _convert_from_xml(self, elem) -> object:
         """
         Converts an XML element to a drawable object.
         :param elem:The XML element to convert.
@@ -115,7 +116,7 @@ class Exporter:
         elif elem.tag == 'group':
             return self._convert_from_group_xml(elem)
 
-    def _convert_line_to_xml(self, line: Line):
+    def _convert_line_to_xml(self, line: Line) -> ET.Element:
         """
         Converts a Line object to XML format.
         :param line: The Line object to convert.
@@ -135,7 +136,7 @@ class Exporter:
             line.colour
         return line_elem
 
-    def _convert_rectangle_to_xml(self, rectangle: Rectangle):
+    def _convert_rectangle_to_xml(self, rectangle: Rectangle) -> ET.Element:
         """
         Converts a Rectangle object to XML format.
 
@@ -159,7 +160,7 @@ class Exporter:
             'Round' if rectangle.corner_type == 'Round' else 'Sharp'
         return rect_elem
 
-    def _convert_group_to_xml(self, group: Group):
+    def _convert_group_to_xml(self, group: Group) -> ET.Element:
         """
         Converts a Group object to XML format.
         :param group:The Group object to convert
@@ -169,7 +170,7 @@ class Exporter:
             group_elem.append(self._convert_to_xml(obj))
         return group_elem
 
-    def _convert_from_line_xml(self, elem):
+    def _convert_from_line_xml(self, elem) -> object:
         """
         Converts an XML element representing a Line object to a Line object.
         """
@@ -181,7 +182,7 @@ class Exporter:
         return Line((start_x, start_y),
                     (end_x, end_y), color)
 
-    def _convert_from_rectangle_xml(self, elem):
+    def _convert_from_rectangle_xml(self, elem) -> object:
         """
         Converts an XML element representing a Rectangle object to a Rectangle object.
         """
@@ -194,7 +195,7 @@ class Exporter:
         return Rectangle((start_x, start_y),
                          (end_x, end_y), color, corner_type)
 
-    def _convert_from_group_xml(self, elem):
+    def _convert_from_group_xml(self, elem) -> object:
         """
         Converts an XML element representing a Group object to a Group object.
         :param elem:The XML element representing the Group object.
@@ -206,13 +207,13 @@ class Exporter:
                 objects.append(obj)
         return Group(objects)
 
-    def _convert_line_to_string(self, line: Line):
+    def _convert_line_to_string(self, line: Line) -> str:
         """
         Converts a Line object to a string.
         """
         return f"line {line.start_point[0]} {line.start_point[1]} {line.end_point[0]} {line.end_point[1]} {line.colour}"
 
-    def _convert_rectangle_to_string(self, rectangle: Rectangle):
+    def _convert_rectangle_to_string(self, rectangle: Rectangle) -> str:
         """
                Converts a Rectangle object to a string.
         """
@@ -220,7 +221,7 @@ class Exporter:
             if rectangle.corner_type == "Round" else "Sharp"
         return f"rect {rectangle.start_point[0]} {rectangle.start_point[1]} {rectangle.end_point[0]} {rectangle.end_point[1]} {rectangle.colour} {corner_style}"
 
-    def _convert_from_string(self, line: str):
+    def _convert_from_string(self, line: str) -> Union[None, object]:
         """
         Converts a string to a drawable object.
         """
@@ -237,7 +238,7 @@ class Exporter:
                              (end_x, end_y), color, corner_style)
         return None
 
-    def _export_group_to_file(self, file, group: Group):
+    def _export_group_to_file(self, file, group: Group) -> None:
         for obj in group.objects:
             if isinstance(obj, Line):
                 file.write(self._convert_line_to_string(obj) + "\n")
@@ -247,7 +248,7 @@ class Exporter:
                 file.write("begin\n")
                 self._export_group_to_file(file, obj)
                 file.write("end\n")
-    def save_to_file(self, file_path='drawing.txt'):
+    def save_to_file(self, file_path='drawing.txt') -> None:
         with open(file_path, "w") as file:
             for drawable in self.drawables:
                 if isinstance(drawable, Line):
@@ -259,8 +260,8 @@ class Exporter:
                     self._export_group_to_file(file, drawable)
                     file.write("end\n")
 
-    def load_from_file(self, file_path='drawing.txt'):
-        def process_group(lines, index):
+    def load_from_file(self, file_path: str = 'drawing.txt') -> object:
+        def process_group(lines: list[str], index: int) -> tuple[object, int]:
             """
             helper method to recursively process group
             """
@@ -295,7 +296,7 @@ class Exporter:
 
         return drawables
 
-    def _import_group_from_file(self, lines):
+    def _import_group_from_file(self, lines: list[str]) -> tuple[list[object], list[str]]:
         """
         Imports a Group object from file lines.
         """
