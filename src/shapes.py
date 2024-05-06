@@ -90,8 +90,8 @@ class Line(Shape):
         return None
     
     def get_duplicate(self):
-        x_offset = 200 if max(self.start_point[0], self.end_point[0]) < 600 else -200
-        y_offset = 100 if max(self.start_point[1], self.end_point[1]) < 500 else -100
+        x_offset = 20
+        y_offset = 20
         start_point = [self.start_point[0] + x_offset, self.start_point[1] + y_offset]
         end_point = [self.end_point[0] + x_offset, self.end_point[1] + y_offset]
         return Line(start_point, end_point)
@@ -162,8 +162,8 @@ class Rectangle(Shape):
         pass
 
     def get_duplicate(self):
-        x_offset = 200 if max(self.start_point[0], self.end_point[0]) < 600 else -200
-        y_offset = 100 if max(self.start_point[1], self.end_point[1]) < 500 else -100
+        x_offset = 20
+        y_offset = 20
         start_point = [self.start_point[0] + x_offset, self.start_point[1] + y_offset]
         end_point = [self.end_point[0] + x_offset, self.end_point[1] + y_offset]
         return Rectangle(start_point, end_point)
