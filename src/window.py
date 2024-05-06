@@ -1,9 +1,12 @@
+"""
+This module defines the Window class for managing the main window of the drawing program.
+"""
+
 import PySimpleGUI as sg
-from constants import *
+from constants import CANVAS_SIZE, BUTTON_SIZE, BIG_BUTTON_SIZE
 
-# Description: Editor window for the user to interact with the program
-
-
+# Description: Editor window for the user to
+# interact with the program
 
 class Window:
     """
@@ -38,7 +41,8 @@ class Window:
             sg.Button("Group", size=BUTTON_SIZE, enable_events=True, key="-GROUP-"),
             sg.Button("UnGroup", size=BUTTON_SIZE, enable_events=True, key="-UNGROUP-"),
             sg.Push(),
-            sg.Button("Export to XML", size=BIG_BUTTON_SIZE, enable_events=True, key="Export to XML"),
+            sg.Button("Export to XML",
+                      size=BIG_BUTTON_SIZE, enable_events=True, key="Export to XML"),
         ]
 
         self.bottombar = [
@@ -56,7 +60,8 @@ class Window:
         ]
 
         self.window = sg.Window(
-            "HARPP Editor", layout=self.layout, margins=(0, 0), finalize=True, enable_close_attempted_event=True
+            "HARPP Editor", layout=self.layout,
+            margins=(0, 0), finalize=True, enable_close_attempted_event=True
         )
 
     def display(self):
@@ -64,7 +69,7 @@ class Window:
         Displays the window and handles events.
         """
         while True:
-            event, values = self.window.read()
+            event, _ = self.window.read()
             if event == sg.WIN_CLOSED:
                 break
         self.window.close()
