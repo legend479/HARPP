@@ -139,12 +139,6 @@ class Rectangle(Shape):
         window.canvas.draw_polygon(
             points, fill_color="", line_color=self.colour, line_width=self.pen_width)
 
-    # def move(self, new_point: tuple[int,int]):
-    #     '''
-    #     For now, the top left corner will be where the mouse click happens'''
-    #     self.start_point = new_point
-    #     self.end_point = [new_point[0] + self.width, new_point[1] +  self.height]
-    #     self.centroid = [(new_point[0] + self.end_point[0]) / 2 , (new_point[1] + self.end_point[1]) / 2]
 
     def detect_selection(self, point: tuple[int, int]):
         """

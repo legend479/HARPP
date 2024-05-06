@@ -1,7 +1,8 @@
 from typing import List, Optional
 from shapes import Shape
 from object import *
-
+import random
+from shapes import Line, Rectangle
 class Group(Object):
     def __init__(self, objects: List[Shape], parent: Optional['Group'] = None):
         self.objects = objects
@@ -28,7 +29,7 @@ class Group(Object):
 
     def draw(self, window):
         for obj in self.objects:
-            print(obj.colour)
+            # print(obj.colour)
             obj.draw(window)
 
     def move(self, delta: tuple[int, int]):
@@ -62,3 +63,18 @@ class Group(Object):
     def get_duplicate(self):
         duplicate_objects = [obj.get_duplicate() for obj in self.objects]
         return Group(duplicate_objects)
+    def update_endpoints_randomly(self):
+        a = [10, 20]  # Example values for random update
+        for obj in self.objects:
+            self._update_endpoints_recursive(obj, a)
+
+    def _update_endpoints_recursive(self, obj, a):
+        if isinstance(obj, (Line, Rectangle)):
+            kk = random.choice(a)
+            new_end_point = (obj.end_point[0] + kk, obj.end_point[1] + kk)
+            obj.end_point = new_end_point
+            new_start_point = (obj.start_point[0] + kk, obj.start_point[1] + kk)
+            obj.start_point = new_start_point
+        elif isinstance(obj, Group):
+            for sub_obj in obj.objects:
+                self._update_endpoints_recursive(sub_obj, a)

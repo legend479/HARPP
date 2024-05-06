@@ -1,6 +1,6 @@
 from dependencies import *
 import PySimpleGUI as sg
-
+import random
 PEN_SIZE = 5
 PEN_COLOR = 'black'
 
@@ -61,6 +61,7 @@ def main():
     drawables = []  # Collection of all groups and individual objects.
     # drawing_line = False
     # drawing_rect = False
+    c_map = {}
     selected_objects = []  # Stores the current objects
     window.canvas.bind("<Motion>", '-Motion-')
     window.canvas.bind("<Button-3>", '-RightClick-')
@@ -74,6 +75,12 @@ def main():
     end_pt = None
     selected_group = None
     selected_object = None
+    def update_colour_recursively(objects, c_map, color):
+        for obj in objects:
+            if isinstance(obj, (Line, Rectangle)) and hasattr(obj, 'colour'):
+                obj.colour = c_map.get(obj, color)
+            elif isinstance(obj, Group):
+                update_colour_recursively(obj.objects, c_map, color)
 
     while True:
         event, values = window.event()
@@ -86,7 +93,11 @@ def main():
                 new_friends = []
                 if len(selected_indices) > 0:
                     for friend in selected_indices:
-                        drawables[friend].colour = color_mapping[friend]
+                        obj = drawables[friend]
+                        if isinstance(obj, (Line, Rectangle)) and hasattr(obj, 'colour'):
+                            obj.colour = c_map.get(obj, DEFAULT_COLOR)
+                        elif isinstance(obj, Group):
+                            update_colour_recursively(obj.objects, c_map, DEFAULT_COLOR)
                         new_friends.append(drawables[friend])
 
                     drawables.append(Group(new_friends))
@@ -100,6 +111,7 @@ def main():
 
                     selected_indices = set()
                     color_mapping = {}
+                    c_map = {}
                     window.canvas.erase()
 
                     for drawable in drawables:
@@ -112,15 +124,28 @@ def main():
             if event == "-CANVAS-":
                 click_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
                 for i, drawable in enumerate(drawables):
-                    # selected_object = drawable.detect_selection(click_pt)
                     if drawable.detect_selection(click_pt):
+                        # if isinstance(drawable, (Line, Rectangle)) and hasattr(drawable, 'colour'):
+                        #     c_map[drawable] = drawable.colour
+                        # elif isinstance(drawable, Group):
+                        #     update_colour_recursively(drawable.objects, c_map, DEFAULT_COLOR)
                         if i not in selected_indices:
                             selected_indices.add(i)
-                            color_mapping[i] = drawable.colour
-                            drawable.colour = "yellow"
+                            if isinstance(drawable, (Line, Rectangle)) and hasattr(drawable, 'colour'):
+                                drawable.colour = "yellow"  # Update the color for individual objects
+                            elif isinstance(drawable, Group):
+                                update_colour_recursively(drawable.objects, c_map, "yellow")
+                            # color_mapping[i] = drawable.colour
+                            # drawable.colour = "yellow"
                         else:
                             selected_indices.remove(i)
-                            del color_mapping[i]
+                            # del color_mapping[i]
+                            obj = drawable
+                            if isinstance(obj, (Line, Rectangle)) and hasattr(obj, 'colour'):
+                                obj.colour = c_map.get(obj, DEFAULT_COLOR)
+                            elif isinstance(obj, Group):
+                                update_colour_recursively(obj.objects, c_map, DEFAULT_COLOR)
+
 
         elif ungroup_mode:
             if event == "-CANVAS-":
@@ -131,6 +156,8 @@ def main():
                         break
                 if isinstance(selected_group, Group):
                     ind = drawables.index(selected_group)
+                    selected_group.update_endpoints_randomly()
+
                     drawables += drawables[ind].objects
                     drawables.pop(ind)
                     window.canvas.erase()
