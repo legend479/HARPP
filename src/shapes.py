@@ -2,13 +2,9 @@ import PySimpleGUI as sg
 from object import Object
 from collections import *
 import math
+from constants import *
 
-PEN_SIZE = 5
-EPSILON = 20
-INF = 100000000000000000000000000000
-DEFAULT_COLOR = 'black'
-CORNER_TYPE = ["Sharp", "Rounded"]
-ROUND_RADIUS = 10
+
 
 
 class Shape(Object):

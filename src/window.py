@@ -1,6 +1,7 @@
 # Description: Editor window for the user to interact with the program
 
 import PySimpleGUI as sg
+from constants import *
 
 
 class Window:
@@ -14,9 +15,9 @@ class Window:
 
         self.theme = sg.theme("DarkBlue")
         self.canvas = sg.Graph(
-            canvas_size=(800, 600),
+            canvas_size=CANVAS_SIZE,
             graph_bottom_left=(0, 0),
-            graph_top_right=(800, 600),
+            graph_top_right=CANVAS_SIZE,
             background_color="white",
             enable_events=True,
             key="-CANVAS-",
@@ -32,17 +33,17 @@ class Window:
             sg.Button("Rectangle", enable_events=True, key="-RECT-",auto_size_button=True),
             sg.Sizer(50, 1),
             sg.Text("Operations:"),
-            sg.Button("Group", size=(10, 1), enable_events=True, key="-GROUP-"),
-            sg.Button("UnGroup", size=(10, 1), enable_events=True, key="-UNGROUP-"),
+            sg.Button("Group", size=BUTTON_SIZE, enable_events=True, key="-GROUP-"),
+            sg.Button("UnGroup", size=BUTTON_SIZE, enable_events=True, key="-UNGROUP-"),
             sg.Push(),
             sg.Button("Export to XML", size=(12, 1), enable_events=True, key="Export to XML"),
         ]
 
         self.bottombar = [
-            sg.Button("Clear", size=(10, 1),key="-CLEAR-",enable_events=True),
+            sg.Button("Clear", size=BUTTON_SIZE,key="-CLEAR-",enable_events=True),
             sg.Push(),
-            sg.Button("Save", size=(10, 1)),
-            sg.Button("Open", size=(10, 1), enable_events=True, key="-OPEN-"),
+            sg.Button("Save", size=BUTTON_SIZE),
+            sg.Button("Open", size=BUTTON_SIZE, enable_events=True, key="-OPEN-"),
 
         ]
 

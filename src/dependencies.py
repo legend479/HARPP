@@ -6,3 +6,4 @@ import window as win
 from shapes import *
 from export import Exporter
 from group import  Group
+from constants import *

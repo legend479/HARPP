@@ -1,7 +1,7 @@
 from dependencies import *
 import PySimpleGUI as sg
-PEN_SIZE = 5
-PEN_COLOR = 'black'
+import random
+
 
 
 def show_menu(cursor_pos):
