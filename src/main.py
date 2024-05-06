@@ -5,29 +5,25 @@ PEN_SIZE = 5
 PEN_COLOR = 'black'
 
 
-def show_menu(cursor_pos, window):
+def show_menu(cursor_pos):
     layout = [
-        [sg.Button("Edit",button_color=("white", "blue"))],
-        [sg.Button("Delete",button_color=("white", "red"))],
-        [sg.Button("Copy&Paste",button_color=("white", "green"))],
-        [sg.Button("Cancel",button_color=("white", "gray"))]
+        [sg.Button("Edit", button_color=("grey", ""))],
+        [sg.Button("Delete" ,button_color=("grey", ""))],
+        [sg.Button("Copy&Paste" ,button_color=("grey", ""))],
+        [sg.Button("Cancel" ,button_color=("grey", "black"))]
     ]
 
     window = sg.Window("Menu", layout, location=cursor_pos,
                        no_titlebar=True, grab_anywhere=True)
+    
+    option = None
     while True:
         event, values = window.read()
-        if event == sg.WIN_CLOSED:
-            break
-        if event == "Edit":
-            break
-        if event == "Delete":
-            break
-        if event == "Copy&Paste":
-            break
-        if event == "Cancel":
+        if event: 
+            option = event
             break
     window.close()
+    return option           
 
 
 def show_edit_popup(drawable):
@@ -264,7 +260,7 @@ def main():
                     drawable.draw(window)
         if event == "-CANVAS--RightClick-":
             click_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
-            for drawable in drawables:
+            for i,drawable in enumerate(drawables):
                 if drawable.detect_selection(click_pt):
                     cursor_pos = values["-CANVAS-"]
                     # convert the cursor position to the window coordinates
@@ -272,7 +268,22 @@ def main():
                         cursor_pos[0]), window.window["-CANVAS-"].Widget.canvasy(cursor_pos[1])
                     cursor_pos = window.window["-CANVAS-"].Widget.winfo_rootx(
                     ) + cursor_pos[0], window.window["-CANVAS-"].Widget.winfo_rooty() + cursor_pos[1]
-                    show_menu(cursor_pos, window)
+                    
+                    option = show_menu(cursor_pos)
+                    if option == "Edit":
+                        show_edit_popup(drawable)
+                    if option == "Delete":
+                        drawables.pop(i)
+                        window.canvas.erase()
+                        for drawable in drawables:
+                            drawable.draw(window)
+                    if option == "Copy&Paste":
+                        copy = drawable.get_duplicate()
+                        drawables.append(copy)
+                        window.canvas.erase()
+                        for drawable in drawables:
+                            drawable.draw(window)
+                    
                     # show_edit_popup(drawable)
                     break
 
