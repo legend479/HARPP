@@ -95,8 +95,8 @@ To get started with the application, follow these steps:
 
 
 ### UML Class Diagram: 
-![UML Class Diagram](ab.jpeg)
+![UML Class Diagram](doc/ab.jpeg)
 ### UML Sequence Diagrams:
-![UML Sequence Diagram 1](SequenceDiagramEdit.jpeg)
-![UML Sequence Diagram 2](SequenceDiagramSave.jpeg)
+![UML Sequence Diagram 1](doc/SequenceDiagramEdit.jpeg)
+![UML Sequence Diagram 2](doc/SequenceDiagramSave.jpeg)
 We have tried our best to keep our code free from code smells and provided detailed method and class docstrings for easy understanding.

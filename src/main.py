@@ -1,8 +1,8 @@
-"""
-Logic where instantiation and exit, event handling takes place
-"""
-from dependencies import *
 import PySimpleGUI as sg
+import window as win
+from shapes import *
+from export import Exporter
+from group import  Group
 from constants import *
 
 def show_menu(cursor_pos):
