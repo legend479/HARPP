@@ -157,7 +157,7 @@ class Exporter:
         ET.SubElement(rect_elem, 'color').text =\
             rectangle.colour
         ET.SubElement(rect_elem, 'corner').text =\
-            'rounded' if rectangle.corner_type == 'r' else 'square'
+            'Round' if rectangle.corner_type == 'Round' else 'Sharp'
         return rect_elem
 
     def _convert_group_to_xml(self, group: Group):
@@ -218,7 +218,7 @@ class Exporter:
                Converts a Rectangle object to a string.
         """
         corner_style = "r"\
-            if rectangle.corner_type == "rounded" else "s"
+            if rectangle.corner_type == "Round" else "Sharp"
         return f"rect {rectangle.start_point[0]} {rectangle.start_point[1]} {rectangle.end_point[0]} {rectangle.end_point[1]} {rectangle.colour} {corner_style}"
 
     def _convert_from_string(self, line: str):
