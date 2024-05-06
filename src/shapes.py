@@ -1,13 +1,15 @@
-import PySimpleGUI as sg
-from object import Object
-from collections import *
+"""
+This module houses all shapes relevant to drawing
+"""
 import math
-from constants import *
+from object import Object
+from constants import DEFAULT_COLOR, PEN_SIZE, INF, ROUND_RADIUS, EPSILON
 
 
 class Shape(Object):
     """
-     This class is a parent class it sets the main template of all the classes making shapes
+     This class is a parent class it sets the main
+     template of all the classes making shapes
     """
 
     def __init__(self, start_point, end_point):
@@ -17,6 +19,9 @@ class Shape(Object):
         self.id = None
 
     def move(self, delta):
+        """
+        Update line shape position
+        """
         start_x, start_y = self.start_point
         end_x, end_y = self.end_point
 
@@ -38,7 +43,8 @@ class Line(Shape):
         This is the line class it helps in making and storing the lines made.
     """
 
-    def __init__(self, start_point: tuple[int,int], end_point: tuple[int,int], color = DEFAULT_COLOR):
+    def __init__(self, start_point: tuple[int,int],
+                 end_point: tuple[int,int], color = DEFAULT_COLOR):
         super().__init__(start_point, end_point)
         diff = [start_point[0] - end_point[0], start_point[1] - end_point[1]]
         if diff[1] != 0:
@@ -53,14 +59,6 @@ class Line(Shape):
         self.id = window.canvas.draw_line(
             self.start_point, self.end_point, color=self.colour, width=self.pen_width)
 
-    # def move(self, new_point: tuple[int,int]):
-    #     '''
-    #     For now, the top left corner will be where the mouse click happens
-    #     '''
-    #     self.start_point = new_point
-    #     self.end_point = [new_point[0] + self.width, new_point[1] + self.height]
-    #     self.centroid = [(self.start_point[0] + self.end_point[0]) / 2 , (self.start_point[1] + self.end_point[1]) / 2]
-
     def detect_selection(self, point: tuple[int, int]):
         """
             It detects whether the click is inside the shape is or not
@@ -73,16 +71,16 @@ class Line(Shape):
         if x<maxx and x>minx and y<maxy and y>miny:
             x, y = point
             # Calculate the line equation: Ax + By + C = 0
-            A = self.end_point[1] - self.start_point[1]
-            B = self.start_point[0] - self.end_point[0]
-            C = self.start_point[1] * self.end_point[0] - self.start_point[0] * self.end_point[1]
+            a = self.end_point[1] - self.start_point[1]
+            b = self.start_point[0] - self.end_point[0]
+            c = self.start_point[1] * self.end_point[0] - self.start_point[0] * self.end_point[1]
 
-            distance = abs(A * x + B * y + C) / ((A ** 2 + B ** 2) ** 0.5)
+            distance = abs(a * x + b * y + c) / ((a ** 2 + b ** 2) ** 0.5)
 
             if distance < EPSILON:
                 return self
         return None
-    
+
     def get_duplicate(self):
         x_offset = 20
         y_offset = 20
@@ -101,7 +99,8 @@ class Rectangle(Shape):
         corner_type (str): The type of corners of the rectangle. Default is 'Sharp'.
     """
 
-    def __init__(self, start_point: tuple[int, int], end_point: tuple[int, int], color=DEFAULT_COLOR, corner_type='Sharp'):
+    def __init__(self, start_point: tuple[int, int],
+                 end_point: tuple[int, int], color=DEFAULT_COLOR, corner_type='Sharp'):
         super().__init__(start_point, end_point)
         self.corner_type = corner_type
 
