@@ -86,7 +86,7 @@ def main():
 
     def update_colour_recursively(objects, c_map, color):
         for obj in objects:
-            if isinstance(obj, Shape) and hasattr(obj, 'colour'):
+            if isinstance(obj, Shape):
                 obj.colour = c_map.get(obj, color)
             elif isinstance(obj, Group):
                 update_colour_recursively(obj.objects, c_map, color)
@@ -115,7 +115,7 @@ def main():
                     if len(selected_indices) > 0:
                         for friend in selected_indices:
                             obj = drawables[friend]
-                            if isinstance(obj, Shape) and hasattr(obj, 'colour'):
+                            if isinstance(obj, Shape):
                                 obj.colour = c_map.get(obj, DEFAULT_COLOR)
                             elif isinstance(obj, Group):
                                 update_colour_recursively(
@@ -146,8 +146,7 @@ def main():
 
                             if i not in selected_indices:
                                 selected_indices.add(i)
-                                if (isinstance(drawable, Shape)
-                                        and hasattr(drawable, 'colour')):
+                                if (isinstance(drawable, Shape)):
                                     drawable.colour = "yellow"
                                 elif isinstance(drawable, Group):
                                     update_colour_recursively(
@@ -156,7 +155,7 @@ def main():
                             else:
                                 selected_indices.remove(i)
                                 obj = drawable
-                                if isinstance(obj, Shape) and hasattr(obj, 'colour'):
+                                if isinstance(obj, Shape):
                                     obj.colour = c_map.get(obj, DEFAULT_COLOR)
                                 elif isinstance(obj, Group):
                                     update_colour_recursively(

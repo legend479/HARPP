@@ -82,6 +82,8 @@ To get started with the application, follow these steps:
 - The `Copy Paste` option copies the currently selected object, allowing you to paste it at a desired location using the cursor.
 - The `Cancel` option takes you back to the previous window.
 
+<small> Note: The Editor inherently implements a layering system, where the last drawn object is always on top of the previous ones and hence is priorit boosted in operations </small>
+
 ## Design patterns used
 
 **Composite**:
