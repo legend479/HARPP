@@ -47,6 +47,16 @@ class Window:
 
         self.bottombar = [
             sg.Button("Clear", size=BUTTON_SIZE, key="-CLEAR-", enable_events=True),
+            sg.Text("Line Width:"),
+            sg.Slider(
+            range=(1, 10),
+            default_value=DEFAULT_PEN_SIZE,
+            orientation="h",
+            size=(10, 10),
+            enable_events=True,
+            key="-LINEWIDTH-",
+            resolution=0.5,            
+            ),
             sg.Push(),
             sg.Button("Save", size=BUTTON_SIZE),
             sg.Button("Open", size=BUTTON_SIZE, enable_events=True, key="Open"),

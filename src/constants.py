@@ -1,7 +1,4 @@
-"""
-All constants used throughout the code
-"""
-PEN_SIZE = 5
+DEFAULT_PEN_SIZE = 1
 PEN_COLOR = 'black'
 EPSILON = 20
 INF = 100000000000000000000000000000

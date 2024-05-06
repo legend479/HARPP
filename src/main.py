@@ -63,7 +63,7 @@ def update_canvas(window, drawables):
 
 
 def main():
-    window = win.Window()
+    window = win.Window(theme="Reddit")
     drawables = []  # Collection of all groups and individual objects.
     # drawing_line = False
     # drawing_rect = False
@@ -81,6 +81,7 @@ def main():
     selected_group = None
     selected_object = None
     unsaved_changes = False
+    pen_width = DEFAULT_PEN_SIZE
 
     def update_colour_recursively(objects, c_map, color):
         for obj in objects:
@@ -105,6 +106,9 @@ def main():
                     break
             if event == sg.WIN_CLOSED :
                     break
+            if event == "-LINEWIDTH-":
+                pen_width = values["-LINEWIDTH-"]
+
             if event == "-GROUP-":
                 group_mode = not group_mode
                 if not group_mode:
@@ -225,15 +229,15 @@ def main():
                                         [0], values["-CANVAS-"][1]]
                         else:
                             end_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
-                            # window.canvas.draw_line(start_pt, end_pt, color=PEN_COLOR, width=PEN_SIZE)
+                            # window.canvas.draw_line(start_pt, end_pt, color=PEN_COLOR, width=pen_width)
                             match drawing_object:
                                 case 1:
-                                    print("TT")
                                     window.window["-LINE-"].update(button_color=sg.theme_button_color())
-                                    drawables.append(Line(start_pt, end_pt))
+                                    drawables.append(Line(start_pt, end_pt, pen_width=pen_width
+                                                          ))
                                 case 2:
                                     window.window["-RECT-"].update(button_color=sg.theme_button_color())
-                                    drawables.append(Rectangle(start_pt, end_pt))
+                                    drawables.append(Rectangle(start_pt, end_pt, pen_width=pen_width))
                             drawing_object = 0
 
                     else:
@@ -274,10 +278,10 @@ def main():
                 match drawing_object:
                     case 1:
                         window.canvas.draw_line(
-                            start_pt, cursor_pos, color=PEN_COLOR, width=PEN_SIZE)
+                            start_pt, cursor_pos, color=PEN_COLOR, width=pen_width)
                     case 2:
                         window.canvas.draw_rectangle(
-                            start_pt, cursor_pos, line_color=PEN_COLOR, line_width=PEN_SIZE)
+                            start_pt, cursor_pos, line_color=PEN_COLOR, line_width=pen_width)
             if event == "Save":
                 save_path = sg.popup_get_file(
                     "Save Drawing", save_as=True, default_extension=".txt")
