@@ -58,3 +58,7 @@ class Group(Object):
                 return sel
 
         return None
+    
+    def get_duplicate(self):
+        duplicate_objects = [obj.get_duplicate() for obj in self.objects]
+        return Group(duplicate_objects)

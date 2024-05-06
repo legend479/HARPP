@@ -173,6 +173,11 @@ def main():
                     selected_group = None
                     selected_object = None
 
+            if event == '-COPY-':
+                if selected_group:
+                    drawables.append(selected_group.get_duplicate())
+                        
+
             if event == '-CANVAS-':
                 if drawing_object:
                     if start_pt is None:
