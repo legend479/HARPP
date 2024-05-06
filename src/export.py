@@ -104,7 +104,7 @@ class Exporter:
         elif isinstance(drawable, Group):
             return self._convert_group_to_xml(drawable)
 
-    def _convert_from_xml(self, elem) -> object:
+    def _convert_from_xml(self, elem: ET.Element) -> object:
         """
         Converts an XML element to a drawable object.
         :param elem:The XML element to convert.
