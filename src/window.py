@@ -14,7 +14,7 @@ class Window:
     Handles background settings, display, events, and closing.
     """
 
-    def __init__(self, theme: str = "Default"):
+    def __init__(self, theme: str = "Default") -> None:
         """
         Initializes the Window class.
         """
@@ -74,7 +74,7 @@ class Window:
             margins=(0, 0), finalize=True, enable_close_attempted_event=True
         )
 
-    def display(self):
+    def display(self) -> None:
         """
         Displays the window and handles events.
         """
@@ -84,13 +84,13 @@ class Window:
                 break
         self.window.close()
 
-    def event(self):
+    def event(self) -> any:
         """
         Returns the current event on the window.
         """
         return self.window.read()
 
-    def close(self):
+    def close(self) -> None:
         """
         Closes the window.
         """

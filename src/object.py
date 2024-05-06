@@ -6,7 +6,7 @@ class Object():
         This is the master class for both group and shapes.
          It provides them a basic structure to start with.
     """
-    def __init__(self, start_point, end_point):
+    def __init__(self, start_point : list[int], end_point: list[int]) -> None:
 
         self.width = end_point[0] - start_point[0]
         self.height = end_point[1] - start_point[1]
@@ -16,9 +16,3 @@ class Object():
         self.end_point = end_point
 
 
-    def contains_point(self, point):
-        """
-        Checks if point is inside
-        the collision bounds of the object
-        """
-        raise NotImplementedError("Contains point method not implemented")

@@ -6,6 +6,7 @@ from shapes import Shape
 from object import Object
 from typing import List, Optional
 from constants import *
+from typing import Union
 
 class Group(Object):
     """
@@ -16,7 +17,7 @@ class Group(Object):
         centroid (List[float]): The centroid of the group.
     """
 
-    def __init__(self, objects: List[Shape], parent: Optional['Group'] = None):
+    def __init__(self, objects: List[Shape]) -> None:
         """
         Initializes a Group object.
 
@@ -28,7 +29,7 @@ class Group(Object):
         self.centroid = [sum([obj.centroid[0] for obj in objects]) / len(objects),
                          sum([obj.centroid[1] for obj in objects]) / len(objects)]
 
-    def draw(self, window):
+    def draw(self, window) -> None:
         """
         Draws the group on the specified window.
 
@@ -38,7 +39,7 @@ class Group(Object):
         for obj in self.objects:
             obj.draw(window)
 
-    def move(self, delta: tuple[int, int]):
+    def move(self, delta: tuple[int, int]) -> None:
         """
         Moves the group by the specified delta.
 
@@ -51,7 +52,7 @@ class Group(Object):
         self.centroid[0] += delta[0]
         self.centroid[1] += delta[1]
 
-    def detect_selection(self, point: tuple[int, int]):
+    def detect_selection(self, point: tuple[int, int]) -> Union[None, object]:
         """
         Detects if the specified point is within any object in the group.
 
@@ -68,7 +69,7 @@ class Group(Object):
 
         return None
 
-    def get_duplicate(self):
+    def get_duplicate(self) -> object:
         """
         Creates a duplicate of the group.
 
@@ -78,7 +79,7 @@ class Group(Object):
         duplicate_objects = [obj.get_duplicate() for obj in self.objects]
         return Group(duplicate_objects)
 
-    def update_endpoints_randomly(self):
+    def update_endpoints_randomly(self) -> None:
         """
         Updates the endpoints of the objects in the group randomly.
         """
