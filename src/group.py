@@ -1,7 +1,9 @@
-from typing import List, Optional
+"""
+Hosts the definition of the group
+"""
+import random
 from shapes import Shape
 from object import Object
-import random
 from typing import List, Optional
 from constants import *
 
@@ -82,22 +84,3 @@ class Group(Object):
         """
         for obj in self.objects:
             obj.move((random.choice(RANDOM_CHOICES), random.choice(RANDOM_CHOICES)))
-
-    # def _update_endpoints_recursive(self, obj, up_bound, low_bound):
-    #     """
-    #     Recursively updates the endpoints of the objects in the group.
-
-    #     Args:
-    #         obj: The object to update the endpoints for.
-    #         up_bound: The upper bound for the random update.
-    #         low_bound: The lower bound for the random update.
-    #     """
-    #     if isinstance(obj, Shape):
-    #         kk = random.randint(up_bound, low_bound)
-    #         new_end_point = (obj.end_point[0] + kk, obj.end_point[1] + kk)
-    #         obj.end_point = new_end_point
-    #         new_start_point = (obj.start_point[0] + kk, obj.start_point[1] + kk)
-    #         obj.start_point = new_start_point
-    #     elif isinstance(obj, Group):
-    #         for sub_obj in obj.objects:
-    #             self._update_endpoints_recursive(sub_obj, up_bound, low_bound)

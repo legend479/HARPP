@@ -1,7 +1,9 @@
+"""
+Logic where instantiation and exit, event handling takes place
+"""
 from dependencies import *
 import PySimpleGUI as sg
 from constants import *
-
 
 def show_menu(cursor_pos):
     layout = [
