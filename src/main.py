@@ -55,6 +55,11 @@ def show_edit_popup(drawable):
 
     window.close()
 
+def update_canvas(window, drawables):
+    window.canvas.erase()
+    for drawable in drawables:
+        drawable.draw(window)
+
 
 def main():
     window = win.Window()
@@ -112,10 +117,7 @@ def main():
                     selected_indices = set()
                     color_mapping = {}
                     c_map = {}
-                    window.canvas.erase()
-
-                    for drawable in drawables:
-                        drawable.draw(window)
+                    update_canvas(window, drawables)
 
                 window.window["-GROUP-"].update(text="Group")
 
@@ -146,6 +148,9 @@ def main():
                             elif isinstance(obj, Group):
                                 update_colour_recursively(obj.objects, c_map, DEFAULT_COLOR)
 
+                        update_canvas(window, drawables)
+                        break
+
 
         elif ungroup_mode:
             if event == "-CANVAS-":
@@ -160,9 +165,7 @@ def main():
 
                     drawables += drawables[ind].objects
                     drawables.pop(ind)
-                    window.canvas.erase()
-                    for drawable in drawables:
-                        drawable.draw(window)
+                    update_canvas(window, drawables)
                     selected_group = None
                     selected_object = None
                     ungroup_mode = False
@@ -234,26 +237,20 @@ def main():
                         selected_group.move(delta)
                         selected_group = None
                         selected_object = None
-                        window.canvas.erase()
-                        for drawable in drawables:
-                            drawable.draw(window)
+                        update_canvas(window, drawables)
 
         if selected_group:
             delta = [values["-CANVAS-"][0] - selected_group.centroid[0],
                      values["-CANVAS-"][1] - selected_group.centroid[1]]
 
             selected_group.move(delta)
-            window.canvas.erase()
-            for drawable in drawables:
-                drawable.draw(window)
+            update_canvas(window, drawables)
 
         if event == "-UNGROUP-":
             ungroup_mode = True
 
         if event == '-CANVAS--Motion-' and start_pt:
-            window.canvas.erase()
-            for drawable in drawables:
-                drawable.draw(window)
+            update_canvas(window, drawables)
             cursor_pos = values["-CANVAS-"]
             match drawing_object:
                 case 1:
@@ -281,10 +278,7 @@ def main():
                         continue
                 exporter = Exporter([])
                 drawables = exporter.load_from_file(open_path)
-                window.canvas.erase()
-                print(drawables)
-                for drawable in drawables:
-                    drawable.draw(window)
+                update_canvas(window, drawables)
         if event == "-CANVAS--RightClick-":
             click_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
             for i,drawable in enumerate(drawables):
@@ -301,22 +295,18 @@ def main():
                         show_edit_popup(drawable)
                     if option == "Delete":
                         drawables.pop(i)
-                        window.canvas.erase()
-                        for drawable in drawables:
-                            drawable.draw(window)
+                        update_canvas(window, drawables)
                     if option == "Copy&Paste":
                         copy = drawable.get_duplicate()
                         drawables.append(copy)
-                        window.canvas.erase()
-                        for drawable in drawables:
-                            drawable.draw(window)
+                        update_canvas(window, drawables)
                     
                     # show_edit_popup(drawable)
                     break
 
         if event == '-CLEAR-':
             drawables = []
-            window.canvas.erase()
+            update_canvas(window, drawables)
 
 
 if __name__ == "__main__":
