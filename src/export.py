@@ -298,7 +298,7 @@ class Exporter:
 
     def _import_group_from_file(self, lines: list[str]) -> tuple[list[object], list[str]]:
         """
-        Imports a Group object from file lines.
+        Imports a Group  object from file lines.
         """
         group_objects = []
         for line in lines:
