@@ -211,7 +211,7 @@ class Exporter:
         """
         Converts a Line object to a string.
         """
-        return f"line {line.start_point[0]} {line.start_point[1]} {line.end_point[0]} {line.end_point[1]} {line.color}"
+        return f"line {line.start_point[0]} {line.start_point[1]} {line.end_point[0]} {line.end_point[1]} {line.pen_width} {line.color}"
 
     def _convert_rectangle_to_string(self, rectangle: Rectangle) -> str:
         """
@@ -219,7 +219,7 @@ class Exporter:
         """
         corner_style = "r"\
             if rectangle.corner_type == "Round" else "Sharp"
-        return f"rect {rectangle.start_point[0]} {rectangle.start_point[1]} {rectangle.end_point[0]} {rectangle.end_point[1]} {rectangle.color} {corner_style}"
+        return f"rect {rectangle.start_point[0]} {rectangle.start_point[1]} {rectangle.end_point[0]} {rectangle.end_point[1]} {rectangle.pen_width} {rectangle.color} {corner_style}"
 
     def _convert_from_string(self, line: str) -> Union[None, object]:
         """
@@ -227,15 +227,15 @@ class Exporter:
         """
         parts = line.split()
         if parts[0] == "line":
-            start_x, start_y, end_x, end_y, color =\
-                list(map(float, parts[1:5])) + [parts[5]]
+            start_x, start_y, end_x, end_y, pen_width, color =\
+                list(map(float, parts[1:6])) + [parts[6]]
             return Line((start_x, start_y),
-                        (end_x, end_y), color)
+                        (end_x, end_y), color, pen_width)
         elif parts[0] == "rect":
-            start_x, start_y, end_x, end_y, color, corner_style =\
-                list(map(float, parts[1:5])) + [parts[5], parts[6]]
+            start_x, start_y, end_x, end_y, pen_width, color, corner_style=\
+                list(map(float, parts[1:6])) + [parts[6], parts[7]]
             return Rectangle((start_x, start_y),
-                             (end_x, end_y), color, corner_style)
+                             (end_x, end_y), color, corner_style,pen_width=pen_width)
         return None
 
     def _export_group_to_file(self, file, group: Group) -> None:

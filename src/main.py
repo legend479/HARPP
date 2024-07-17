@@ -2,328 +2,325 @@ import PySimpleGUI as sg
 import window as win
 from shapes import *
 from export import Exporter
-from group import  Group
+from group import Group
 from constants import *
 from typing import Union
 
-def show_menu(cursor_pos: tuple[int, int]) -> Union[None, any]:
-    layout = [
-        [sg.Button("Edit")],
-        [sg.Button("Delete")],
-        [sg.Button("Copy&Paste")],
-        [sg.Button("Cancel", button_color="red")]
-    ]
+class DrawingApp:
+    def __init__(self):
+        self.window = win.Window(theme="Reddit")
+        self.drawables = []
+        self.selected_objects = []
+        self.group_mode = False
+        self.ungroup_mode = False
+        self.selected_indices = set()
+        self.drawing_object = 0
+        self.start_pt = None
+        self.end_pt = None
+        self.selected_group = None
+        self.selected_object = None
+        self.unsaved_changes = False
+        self.pen_width = DEFAULT_PEN_SIZE
 
-    window = sg.Window("Menu", layout, location=cursor_pos,
-                       no_titlebar=True, grab_anywhere=True)
+        self.setup_bindings()
 
-    option = None
-    while True:
-        event, values = window.read()
-        if event:
-            option = event
-            break
-    window.close()
-    return option
+    def setup_bindings(self):
+        self.window.canvas.bind("<Motion>", '-Motion-')
+        self.window.canvas.bind("<Button-3>", '-RightClick-')
 
+    def run(self):
+        while True:
+            event, values = self.window.event()
+            if self.handle_event(event, values):
+                break
 
-def show_edit_popup(drawable: object) -> None:
-    layout = [
-        [sg.Text("Edit Object")],
-        [sg.Text("Color"), sg.InputText(drawable.color, key="-COLOR-")],
-        [sg.Text("Width"), sg.InputText(drawable.pen_width, key="-WIDTH-")],
+    def handle_event(self, event, values):
+        event_handlers = {
+            sg.WIN_CLOSE_ATTEMPTED_EVENT: self.handle_close_attempt,
+            sg.WIN_CLOSED: lambda _: True,
+            "-LINEWIDTH-": self.handle_line_width,
+            "-GROUP-": self.handle_group,
+            "-CANVAS-": self.handle_canvas_click,
+            "-LINE-": self.handle_line_tool,
+            "-RECT-": self.handle_rect_tool,
+            "Export to XML": self.handle_export_xml,
+            "-DELETE-": self.handle_delete,
+            "-COPY-": self.handle_copy,
+            "-UNGROUP-": self.handle_ungroup,
+            '-CANVAS--Motion-': self.handle_canvas_motion,
+            "Save": self.handle_save,
+            "Open": self.handle_open,
+            "-CANVAS--RightClick-": self.handle_right_click,
+            '-CLEAR-': self.handle_clear,
+        }
 
-        [sg.Text("Corner Type"), sg.DropDown(["Round", "Sharp"], default_value=drawable.corner_type,
-                                             key="-TYPE-")] if isinstance(drawable, Rectangle) else [],
+        handler = event_handlers.get(event)
+        if handler:
+            return handler(values)
 
-        [sg.Button("Save", key="Save"), sg.Button("Cancel", key="-CANCEL-")]
-    ]
+    def handle_close_attempt(self, values):
+        if self.unsaved_changes:
+            confirm = sg.popup_yes_no("You have unsaved changes. Do you want to continue?")
+            return confirm == "Yes"
+        return True
 
-    window = sg.Window("Edit Object", layout)
+    def handle_line_width(self, values):
+        self.pen_width = values["-LINEWIDTH-"]
 
-    while True:
-        event, values = window.read()
-        if event == sg.WIN_CLOSED:
-            break
-        if event == "Save":
-            drawable.color = values["-COLOR-"]
-            drawable.pen_width = values["-WIDTH-"]
-            if isinstance(drawable, Rectangle):
-                drawable.corner_type = values["-TYPE-"]
-            break
-        if event == "-CANCEL-":
-            break
+    def handle_group(self, values):
+        self.group_mode = not self.group_mode
+        self.ungroup_mode = False
+        if not self.group_mode:
+            new_grp = []
+            if len(self.selected_indices) > 0:
+                for indx in self.selected_indices:
+                    obj = self.drawables[indx]
+                    self.propagate_selection(obj, False)
+                    new_grp.append(self.drawables[indx])
 
-    window.close()
+                self.drawables.append(Group(new_grp))
+                li = sorted(list(self.selected_indices), reverse=True)
 
+                for indx in li:
+                    self.drawables.pop(indx)
 
-def update_canvas(window: sg.Window, drawables: list[object]) -> None:
-    window.canvas.erase()
-    for drawable in drawables:
-        drawable.draw(window)
+                self.selected_indices = set()
+                self.update_canvas()
+                self.unsaved_changes = True
 
+            self.window.window["-GROUP-"].update(text="Group")
+        else:
+            self.window.window["-GROUP-"].update(text="Done")
 
-def propagate_selection(obj: Object, selected: bool) -> None:
-        """
-            It propagates the selection to the children
-        """
-        if (isinstance(obj, Shape)):
+    def handle_canvas_click(self, values):
+        if self.group_mode:
+            click_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
+            for i, drawable in enumerate(self.drawables[::-1]):
+                if drawable.detect_selection(click_pt):
+                    if i not in self.selected_indices:
+                        self.selected_indices.add(i)
+                        self.propagate_selection(drawable, True)
+                    else:
+                        self.selected_indices.remove(i)
+                        self.propagate_selection(drawable, False)
+                    self.update_canvas()
+                    self.unsaved_changes = True
+                    break
+        elif self.ungroup_mode:
+            click_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
+            for drawable in self.drawables[::-1]:
+                if drawable.detect_selection(click_pt):
+                    self.selected_group = drawable
+                    break
+            if isinstance(self.selected_group, Group):
+                ind = self.drawables.index(self.selected_group)
+                self.selected_group.update_endpoints_randomly()
+                self.drawables += self.drawables[ind].objects
+                self.drawables.pop(ind)
+                self.update_canvas()
+                self.unsaved_changes = True
+                self.selected_group = None
+                self.selected_object = None
+                self.ungroup_mode = False
+            else:
+                self.ungroup_mode = False
+                self.selected_group = None
+                self.selected_object = None
+        else:
+            if self.drawing_object:
+                if self.start_pt is None:
+                    self.start_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
+                else:
+                    self.end_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
+                    if self.drawing_object == 1:
+                        self.window.window["-LINE-"].update(button_color=sg.theme_button_color())
+                        self.drawables.append(Line(self.start_pt, self.end_pt, pen_width=self.pen_width))
+                    elif self.drawing_object == 2:
+                        self.window.window["-RECT-"].update(button_color=sg.theme_button_color())
+                        self.drawables.append(Rectangle(self.start_pt, self.end_pt, pen_width=self.pen_width))
+                    self.drawing_object = 0
+            else:
+                click_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
+                if not self.selected_group:
+                    for drawable in self.drawables[::-1]:
+                        self.selected_object = drawable.detect_selection(click_pt)
+                        if self.selected_object:
+                            self.selected_group = drawable
+                            break
+                else:
+                    delta = [values["-CANVAS-"][0] - self.selected_group.centroid[0],
+                             values["-CANVAS-"][1] - self.selected_group.centroid[1]]
+                    self.selected_group.move(delta)
+                    self.selected_group = None
+                    self.selected_object = None
+                    self.update_canvas()
+                    self.unsaved_changes = True
+
+    def handle_line_tool(self, values):
+        self.window.window["-LINE-"].update(button_color="light blue")
+        self.drawing_object = 1 if self.drawing_object != 1 else 0
+        self.start_pt = None
+        self.end_pt = None
+
+    def handle_rect_tool(self, values):
+        self.window.window["-RECT-"].update(button_color="light blue")
+        self.drawing_object = 2 if self.drawing_object != 2 else 0
+        self.start_pt = None
+        self.end_pt = None
+
+    def handle_export_xml(self, values):
+        exporter = Exporter(self.drawables)
+        file_path = sg.popup_get_file('Save As', save_as=True, file_types=(("XML Files", "*.xml"),))
+        if file_path:
+            exporter.export_to_xml(file_path + '.xml')
+
+    def handle_delete(self, values):
+        if self.selected_group:
+            ind = self.drawables.index(self.selected_group)
+            self.drawables.pop(ind)
+            self.selected_group = None
+            self.selected_object = None
+            self.update_canvas()
+            self.unsaved_changes = True
+
+    def handle_copy(self, values):
+        if self.selected_group:
+            self.drawables.append(self.selected_group.get_duplicate())
+            self.update_canvas()
+            self.unsaved_changes = True
+
+    def handle_ungroup(self, values):
+        if not self.group_mode: self.ungroup_mode = True
+
+    def handle_canvas_motion(self, values):
+        if self.start_pt:
+            self.update_canvas()
+            self.unsaved_changes = True
+            cursor_pos = values["-CANVAS-"]
+            if self.drawing_object == 1:
+                self.window.canvas.draw_line(self.start_pt, cursor_pos, color=PEN_COLOR, width=self.pen_width)
+            elif self.drawing_object == 2:
+                self.window.canvas.draw_rectangle(self.start_pt, cursor_pos, line_color=PEN_COLOR, line_width=self.pen_width)
+        if self.selected_group:
+            # end_pt = (values["-CANVAS-"][0], values["-CANVAS-"][1])
+            delta = (values["-CANVAS-"][0] - self.selected_group.centroid[0], values["-CANVAS-"][1]- self.selected_group.centroid[1])
+            self.selected_group.move(delta)
+            self.update_canvas()
+
+    def handle_save(self, values):
+        save_path = sg.popup_get_file("Save Drawing", save_as=True, default_extension=".txt")
+        if save_path:
+            exporter = Exporter(self.drawables)
+            exporter.save_to_file(save_path)
+            self.unsaved_changes = False
+
+    def handle_open(self, values):
+        if self.unsaved_changes:
+            confirm = sg.popup_yes_no("You have unsaved changes. Do you want to continue?")
+            if confirm == "No":
+                return
+        open_path = sg.popup_get_file("Open Drawing", default_extension=".txt")
+        if open_path:
+            exporter = Exporter([])
+            try:
+                self.drawables = exporter.load_from_file(open_path)
+            except Exception as e:
+                sg.popup_error(f"Error loading file: {e}")
+                return
+            self.update_canvas()
+            self.unsaved_changes = False
+
+    def handle_right_click(self, values):
+        click_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
+        for i, drawable in enumerate(self.drawables[::-1]):
+            if (selected_object := drawable.detect_selection(click_pt)):
+                cursor_pos = values["-CANVAS-"]
+                cursor_pos = self.window.window["-CANVAS-"].Widget.canvasx(cursor_pos[0]), self.window.window["-CANVAS-"].Widget.canvasy(cursor_pos[1])
+                cursor_pos = (self.window.window["-CANVAS-"].Widget.winfo_rootx() + cursor_pos[0], 
+                              self.window.window["-CANVAS-"].Widget.winfo_rooty() + CANVAS_SIZE[1] - cursor_pos[1])
+                option = self.show_menu(cursor_pos)
+                self.unsaved_changes = True
+
+                if option == "Edit":
+                    self.show_edit_popup(selected_object)
+                if option == "Delete":
+                    self.drawables.pop(len(self.drawables) - 1 - i)
+                    self.update_canvas()
+                    self.selected_group = None
+                if option == "Copy&Paste":
+                    copy = drawable.get_duplicate()
+                    self.drawables.append(copy)
+                    self.update_canvas()
+                    self.selected_group = copy
+                break
+
+    def handle_clear(self, values):
+        self.drawables = []
+        self.update_canvas()
+        self.unsaved_changes = True
+
+    def update_canvas(self):
+        self.window.canvas.erase()
+        for drawable in self.drawables:
+            drawable.draw(self.window)
+
+    def propagate_selection(self, obj, selected):
+        if isinstance(obj, Shape):
             obj.selected = selected
         elif isinstance(obj, Group):
             for c_obj in obj.objects:
-                propagate_selection(c_obj, selected)
+                self.propagate_selection(c_obj, selected)
+
+    def show_menu(self, cursor_pos):
+        layout = [
+            [sg.Button("Edit")],
+            [sg.Button("Delete")],
+            [sg.Button("Copy&Paste")],
+            [sg.Button("Cancel", button_color="red")]
+        ]
+
+        window = sg.Window("Menu", layout, location=cursor_pos, no_titlebar=True, grab_anywhere=True)
+
+        option = None
+        while True:
+            event, values = window.read()
+            if event:
+                option = event
+                break
+        window.close()
+        return option
+
+    def show_edit_popup(self, drawable):
+        layout = [
+            [sg.Text("Edit Object")],
+            [sg.Text("Color"), sg.InputText(drawable.color, key="-COLOR-")],
+            [sg.Text("Width"), sg.InputText(drawable.pen_width, key="-WIDTH-")],
+            [sg.Text("Corner Type"), sg.DropDown(["Round", "Sharp"], default_value=drawable.corner_type, key="-TYPE-")] if isinstance(drawable, Rectangle) else [],
+            [sg.Button("Save", key="Save"), sg.Button("Cancel", key="-CANCEL-")]
+        ]
+
+        window = sg.Window("Edit Object", layout)
+
+        while True:
+            event, values = window.read()
+            if event == sg.WIN_CLOSED:
+                break
+            if event == "Save":
+                drawable.color = values["-COLOR-"]
+                drawable.pen_width = values["-WIDTH-"]
+                if isinstance(drawable, Rectangle):
+                    drawable.corner_type = values["-TYPE-"]
+                break
+            if event == "-CANCEL-":
+                break
+
+        window.close()
+        self.update_canvas()
 
 def main():
-    window = win.Window(theme="Reddit")
-    drawables = []  # Collection of all groups and individual objects.
-    # drawing_line = False
-    # drawing_rect = False
-    selected_objects = []  # Stores the current objects
-    window.canvas.bind("<Motion>", '-Motion-')
-    window.canvas.bind("<Button-3>", '-RightClick-')
-    group_mode = False
-    ungroup_mode = False
-    selected_indices = set()
-    drawing_object = 0  # 0 refers to not drawing. 1 refers to line and 2 refers to rectangle
-    start_pt = None
-    groups = []
-    end_pt = None
-    selected_group = None
-    selected_object = None
-    unsaved_changes = False
-    pen_width = DEFAULT_PEN_SIZE
-
+    app = DrawingApp()
     try:
-        while True:
-            event, values = window.event()
-            if event == sg.WIN_CLOSE_ATTEMPTED_EVENT:
-                if unsaved_changes:
-                    confirm = sg.popup_yes_no(
-                        "You have unsaved changes. Do you want to continue?")
-                    if confirm == "No":
-                        continue
-                    else:
-                        break
-                else:
-                    break
-            if event == sg.WIN_CLOSED :
-                    break
-            if event == "-LINEWIDTH-":
-                pen_width = values["-LINEWIDTH-"]
-
-            if event == "-GROUP-":
-                group_mode = not group_mode
-                ungroup_mode = False
-                if not group_mode:
-                    new_grp = []
-                    if len(selected_indices) > 0:
-                        for indx in selected_indices:
-                            obj = drawables[indx]
-                            propagate_selection(obj,False)
-                            new_grp.append(drawables[indx])
-
-                        drawables.append(Group(new_grp))
-                        li = sorted(list(selected_indices), reverse=True)
-
-                        for indx in li:
-                            drawables.pop(indx)
-
-                        selected_indices = set()
-                        update_canvas(window, drawables)
-                        unsaved_changes = True
-
-                    window.window["-GROUP-"].update(text="Group")
-
-            if group_mode:
-                window.window["-GROUP-"].update(text="Done")
-                if event == "-CANVAS-":
-                    click_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
-                    for i, drawable in enumerate(drawables[::-1]):
-                        if drawable.detect_selection(click_pt):
-
-                            if i not in selected_indices:
-                                selected_indices.add(i)
-                                propagate_selection(drawable,True)
-
-                            else:
-                                selected_indices.remove(i)
-                                propagate_selection(drawable,False)
-
-                            update_canvas(window, drawables)
-                            unsaved_changes = True
-                            break
-
-            elif ungroup_mode:
-                if event == "-CANVAS-":
-                    click_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
-                    for drawable in drawables[::-1]:
-                        if drawable.detect_selection(click_pt):
-                            selected_group = drawable
-                            break
-                    if isinstance(selected_group, Group):
-                        ind = drawables.index(selected_group)
-                        selected_group.update_endpoints_randomly()
-
-                        drawables += drawables[ind].objects
-                        drawables.pop(ind)
-                        update_canvas(window, drawables)
-                        unsaved_changes = True
-
-                        selected_group = None
-                        selected_object = None
-                        ungroup_mode = False
-                    else:
-                        ungroup_mode = False
-                        selected_group = None
-                        selected_object = None
-
-            else:
-                if event == "-LINE-":
-                    window.window["-LINE-"].update(button_color="light blue")
-                    drawing_object = 1 if drawing_object != 1 else 0
-                    start_pt = None
-                    end_pt = None
-
-                if event == "-RECT-":
-                    window.window["-RECT-"].update(button_color="light blue")
-                    drawing_object = 2 if drawing_object != 2 else 0
-                    start_pt = None
-                    end_pt = None
-                if event == 'Export to XML':
-                    exporter = Exporter(drawables)
-                    file_path = sg.popup_get_file(
-                        'Save As', save_as=True, file_types=(("XML Files", "*.xml"),))
-                    if file_path:
-                        exporter.export_to_xml(file_path+'.xml')
-
-                if event == "-DELETE-":
-                    if selected_group:
-                        ind = drawable.index(selected_group)
-                        drawable.remove(ind)
-                        selected_group = None
-                        selected_object = None
-
-                if event == '-COPY-':
-                    if selected_group:
-                        drawables.append(selected_group.get_duplicate())
-
-                if event == '-CANVAS-':
-                    if drawing_object:
-                        if start_pt is None:
-                            start_pt = [values["-CANVAS-"]
-                                        [0], values["-CANVAS-"][1]]
-                        else:
-                            end_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
-                            # window.canvas.draw_line(start_pt, end_pt, color=PEN_COLOR, width=pen_width)
-                            match drawing_object:
-                                case 1:
-                                    window.window["-LINE-"].update(button_color=sg.theme_button_color())
-                                    drawables.append(Line(start_pt, end_pt, pen_width=pen_width
-                                                          ))
-                                case 2:
-                                    window.window["-RECT-"].update(button_color=sg.theme_button_color())
-                                    drawables.append(Rectangle(start_pt, end_pt, pen_width=pen_width))
-                            drawing_object = 0
-
-                    else:
-                        click_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
-                        if not selected_group:
-                            for drawable in drawables[::-1]:
-                                selected_object = drawable.detect_selection(
-                                    click_pt)
-                                if selected_object:
-                                    selected_group = drawable
-                                    break
-
-                        else:
-                            delta = [values["-CANVAS-"][0] - selected_group.centroid[0],
-                                    values["-CANVAS-"][1] - selected_group.centroid[1]]
-
-                            selected_group.move(delta)
-                            selected_group = None
-                            selected_object = None
-                            update_canvas(window, drawables)
-                            unsaved_changes = True
-
-            if selected_group:
-                delta = [values["-CANVAS-"][0] - selected_group.centroid[0],
-                        values["-CANVAS-"][1] - selected_group.centroid[1]]
-
-                selected_group.move(delta)
-                update_canvas(window, drawables)
-                unsaved_changes = True
-
-            if event == "-UNGROUP-":
-                ungroup_mode = True
-
-            if event == '-CANVAS--Motion-' and start_pt:
-                update_canvas(window, drawables)
-                unsaved_changes = True
-                cursor_pos = values["-CANVAS-"]
-                match drawing_object:
-                    case 1:
-                        window.canvas.draw_line(
-                            start_pt, cursor_pos, color=PEN_COLOR, width=pen_width)
-                    case 2:
-                        window.canvas.draw_rectangle(
-                            start_pt, cursor_pos, line_color=PEN_COLOR, line_width=pen_width)
-            if event == "Save":
-                save_path = sg.popup_get_file(
-                    "Save Drawing", save_as=True, default_extension=".txt")
-                if save_path:
-                    exporter = Exporter(drawables)
-                    exporter.save_to_file(save_path)
-                    unsaved_changes = False
-
-            if event == "Open":
-                if unsaved_changes:                    
-                    confirm = sg.popup_yes_no(
-                        "You have unsaved changes. Do you want to continue?")
-                    if confirm == "No":
-                        continue
-                    
-                open_path = sg.popup_get_file(
-                    "Open Drawing", default_extension=".txt")
-                if open_path:                   
-                    exporter = Exporter([])
-                    try: 
-                        drawables = exporter.load_from_file(open_path)
-                    except Exception as e:
-                        sg.popup_error(f"Error loading file: {e}")
-                        continue
-                    update_canvas(window, drawables)
-                    unsaved_changes = False
-
-            if event == "-CANVAS--RightClick-":
-                click_pt = [values["-CANVAS-"][0], values["-CANVAS-"][1]]
-                for i, drawable in enumerate(drawables[::-1]):
-                    if (selected_object:=drawable.detect_selection(click_pt)):
-                        cursor_pos = values["-CANVAS-"]
-                        cursor_pos = window.window["-CANVAS-"].Widget.canvasx(
-                            cursor_pos[0]), window.window["-CANVAS-"].Widget.canvasy(cursor_pos[1])
-                        cursor_pos = (window.window["-CANVAS-"].Widget.winfo_rootx(
-                        ) + cursor_pos[0], window.window["-CANVAS-"].Widget.winfo_rooty()
-                            + CANVAS_SIZE[1] - cursor_pos[1])
-                        option = show_menu(cursor_pos)
-                        unsaved_changes = True
-
-                        # HERE
-                        if option == "Edit":
-                            show_edit_popup(selected_object)
-                        if option == "Delete":
-                            drawables.pop(i)
-                            update_canvas(window, drawables)
-                            selected_group = None
-                        if option == "Copy&Paste":
-                            copy = drawable.get_duplicate()
-                            drawables.append(copy)
-                            update_canvas(window, drawables)
-                            selected_group = copy
-                        break
-
-            if event == '-CLEAR-':
-                drawables = []
-                update_canvas(window, drawables)
+        app.run()
     except FileNotFoundError:
         sg.popup_error("File not found.")
     except PermissionError:

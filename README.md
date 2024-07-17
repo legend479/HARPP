@@ -102,3 +102,7 @@ To get started with the application, follow these steps:
 ![UML Sequence Diagram 1](doc/SequenceDiagramEdit.jpeg)
 ![UML Sequence Diagram 2](doc/SequenceDiagramSave.jpeg)
 We have tried our best to keep our code free from code smells and provided detailed method and class docstrings for easy understanding.
+
+# TO DOs:
+- fix group bug @raveeshvyas
+- implement import from xml and add pen_width to xml file. @Harpreet287
